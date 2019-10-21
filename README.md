@@ -1,5 +1,9 @@
 # Word Blitz Bot
-Can automatically solve a word blitz game.
+Can automatically solve a word blitz game. To run the program execute the following command.
+
+```
+python3 run_bot.py
+```
 
 ## Completed
 * Parser for converting list of dictionary words into a tree
