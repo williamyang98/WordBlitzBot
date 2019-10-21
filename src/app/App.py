@@ -3,6 +3,7 @@ import mss
 import numpy as np
 import threading
 import pytesseract
+import os
 
 from pynput.keyboard import Key, Listener
 
@@ -13,6 +14,7 @@ class App:
         self.screen_rect = screen_rect
         self.offset = (0, 0)
 
+        self.override_export = False
         self.preview = None
         self.preview_thread_lock = threading.RLock()
 
@@ -56,6 +58,28 @@ class App:
         whitelist = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz|"
         label = pytesseract.image_to_string(stitched, lang="eng", config=f"--psm 7 -c tessedit_char_whitelist={whitelist}")
         print(label)
+    
+    def export_samples(self, ext="png"):
+        image = self.get_screenshot()
+        for key in self.bounding_boxes.keys():
+            boxes = self.bounding_boxes.get(key, [])
+            samples = self.get_bounding_boxes(image, boxes)
+            i = 0
+            for sample in samples:
+                filename = os.path.join(self.args.export, key, f"sample_{i}.{ext}")
+
+                while not self.override_export and os.path.exists(filename):
+                    i += 1
+                    filename = os.path.join(self.args.export, key, f"sample_{i}.{ext}")
+
+                cv2.imwrite(filename, sample)
+                i += 1
+
+    def get_bounding_boxes(self, image, boxes):
+        for box in boxes:
+            left, top, right, bottom = box
+            sample = image[top:bottom,left:right,:]
+            yield sample
 
 class ScreenRect:
     def __init__(self, rect):

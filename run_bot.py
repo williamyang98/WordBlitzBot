@@ -11,6 +11,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--boxes", default="assets/bounding_boxes.txt")
     parser.add_argument("--tesseract-cmd", default=r"C:/Program Files/Tesseract-OCR/tesseract.exe")
+    parser.add_argument("--export", default=r"assets/data")
 
     args = parser.parse_args()
 
@@ -21,6 +22,7 @@ def main():
     screen_rect = ScreenRect(screen_rect)
 
     app = App(bounding_boxes, screen_rect)
+    app.args = args
 
     QtWidgets.QApplication.setStyle("fusion")
     qt_app = QtWidgets.QApplication([])
