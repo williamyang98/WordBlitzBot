@@ -4,12 +4,16 @@ Can automatically solve a word blitz game. To run the program execute the follow
 ```
 python3 run_bot.py
 ```
+Press read to create the word matrix. If there are an incorrect characters, fix these up.
+Then press solve to automatically solve Word Blitz. For the time being, the only way to stop the program
+is to CTRL-ALT-DELETE.
 
 ## Completed
-* Parser for converting list of dictionary words into a tree
-* Solver for word matrix
-* Cropping for all characters
+* Autoclicking and dragging
 * Basic UI
+* Solver for word matrix
+* Parser for converting list of dictionary words into a tree
+* Cropping for all characters
 
 ## Todo
 * Implement custom deep neural nets to process the image 
@@ -19,8 +23,8 @@ python3 run_bot.py
   * Main characters in the tiles (centre)
   * Value of the letter (top right)
   * Bonus associated with tile (top left)
-* Implement autoclicking and dragging
 * Implement a kill switch to toggle the bot
+* Decrease loading times (mainly constructing the word tree)
 
 ## Gallery
 ![alt text](docs/window.png "Main window")
