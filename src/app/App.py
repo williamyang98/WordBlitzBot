@@ -44,8 +44,8 @@ class App:
     
     def solve_matrix(self, matrix):
         if self.word_tree is None:
-            print("Work tree not loaded")
-            return
+            print("Word tree not loaded in yet")
+            return []
         result = search_entire_matrix(matrix, self.word_tree)
         return result
         
@@ -59,7 +59,7 @@ class App:
         left, top, right, bottom = boxes[0]
         width, height = right-left, bottom-top
 
-        whitelist = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        whitelist = "ABCDEFGHIJKLMNOPQRSTUVWXYZl"
         
         # stitched = np.full((height, width*len(boxes)), 255)
         labels = []
@@ -70,6 +70,8 @@ class App:
             label = pytesseract.image_to_string(cropped_image, lang="eng", config=f"--psm 10 -c tessedit_char_whitelist={whitelist}")
             if not label:
                 label = ''
+            if label == 'l':
+                label = 'i'
             if len(label) > 0:
                 label = label[0]
             label = label.upper()

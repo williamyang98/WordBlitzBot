@@ -103,10 +103,12 @@ class Controls(QtWidgets.QWidget):
             matrix.append(row)
         matrix = np.array(matrix)
 
-        print(matrix)
 
         paths = self.app.solve_matrix(matrix)
-        print(paths)
+
+        # TODO: Calculate score for each path and find best paths for each word
+        # TODO: Incoporate other metadata (bonuses and value)
+        # TODO: Show the list of solved words and their values in a list somewhere
         filtered_paths = {}
 
         for word, path in paths:
@@ -119,7 +121,7 @@ class Controls(QtWidgets.QWidget):
             filtered_path_list.append((word, path))
         
         filtered_path_list = sorted(filtered_path_list, key=lambda x: len(x[0]), reverse=True)
-        print(filtered_path_list)
+
         for word, path in filtered_path_list:
             self.solve_path(path, coordinates)
             time.sleep(0.04)
