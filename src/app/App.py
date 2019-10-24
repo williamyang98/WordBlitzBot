@@ -5,7 +5,7 @@ import threading
 import pytesseract
 import os
 
-from pynput.keyboard import Key, Listener
+from src.matrix_search import search_entire_matrix
 
 class App:
     def __init__(self, bounding_boxes, screen_rect):
@@ -17,6 +17,9 @@ class App:
         self.override_export = False
         self.preview = None
         self.preview_thread_lock = threading.RLock()
+
+        self.word_tree = None
+
 
     def take_screenshot(self):
         image = self.get_screenshot()
@@ -39,6 +42,14 @@ class App:
 
         return image
     
+    def solve_matrix(self, matrix):
+        if self.word_tree is None:
+            print("Work tree not loaded")
+            return
+        result = search_entire_matrix(matrix, self.word_tree)
+        return result
+        
+    
     def read_labels(self):
         boxes = self.bounding_boxes.get("characters", [])
         image = self.get_screenshot()
@@ -47,17 +58,27 @@ class App:
 
         left, top, right, bottom = boxes[0]
         width, height = right-left, bottom-top
+
+        whitelist = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
         
-        stitched = np.full((height, width*len(boxes)), 255)
+        # stitched = np.full((height, width*len(boxes)), 255)
+        labels = []
         for i, box in enumerate(boxes):
             left, top, right, bottom = box
             cropped_image = image[top:bottom,left:right]
-            stitched[:,i*width:(i+1)*width] = cropped_image
-            # cropped_image = cv2.resize(cropped_image, (16, 16))
+            # stitched[:,i*width:(i+1)*width] = cropped_image
+            label = pytesseract.image_to_string(cropped_image, lang="eng", config=f"--psm 10 -c tessedit_char_whitelist={whitelist}")
+            if not label:
+                label = ''
+            if len(label) > 0:
+                label = label[0]
+            label = label.upper()
+            
+            labels.append(label)
 
-        whitelist = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz|"
-        label = pytesseract.image_to_string(stitched, lang="eng", config=f"--psm 7 -c tessedit_char_whitelist={whitelist}")
-        print(label)
+        # label = pytesseract.image_to_string(stitched, lang="eng", config=f"--psm 7 -c tessedit_char_whitelist={whitelist}")
+        matrix = np.array(labels).reshape((4, 4))
+        return matrix
     
     def export_samples(self, ext="png"):
         image = self.get_screenshot()
@@ -80,7 +101,7 @@ class App:
             left, top, right, bottom = box
             sample = image[top:bottom,left:right,:]
             yield sample
-
+    
 class ScreenRect:
     def __init__(self, rect):
         left, top, width, height = rect
