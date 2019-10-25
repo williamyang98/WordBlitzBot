@@ -14,6 +14,9 @@ is to CTRL-ALT-DELETE.
 * Solver for word matrix
 * Parser for converting list of dictionary words into a tree
 * Cropping for all characters
+* Optimization to solve higher value words
+  * Detect if there is a bonus
+  * Start off with longest words
 
 ## Todo
 * Implement custom deep neural nets to process the image 
@@ -25,6 +28,11 @@ is to CTRL-ALT-DELETE.
   * Bonus associated with tile (top left)
 * Implement a kill switch to toggle the bot
 * Decrease loading times (mainly constructing the word tree)
+  * Remove invalid words
+  * Convert to a faster to load format (store word tree directly?)
+* Add learning where invalid words are pruned from word tree, and missing words are added
+  * Invalid words can be detected from the game (lack of +score indicator above grid)
+  * Missing valid words have to be manually added from the post game screen
 
 ## Gallery
 ![alt text](docs/window.png "Main window")
