@@ -48,12 +48,34 @@ class App:
             return []
         result = search_entire_matrix(matrix, self.word_tree)
         return result
-        
+
+    def read_data(self):
+        screenshot = self.get_screenshot()
+        bonuses = self.read_bonuses(screenshot)
+        characters = self.read_characters(screenshot)
+
+        return (characters, bonuses)
+
+    def read_bonuses(self, screenshot):
+        boxes = self.bounding_boxes.get("bonuses")
+        image = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+        _, image = cv2.threshold(image, 100, 255, cv2.THRESH_BINARY)
+
+        bonuses = []
+        for box in boxes:
+            left, top, right, bottom = box
+            cropped_image = image[top:bottom,left:right]
+            total_white = (cropped_image < 120).sum()
+            bonus = int(total_white < 5)
+            bonuses.append(bonus)
+
+        bonuses = np.array(bonuses).reshape((4, 4))
+        return bonuses
+
     
-    def read_labels(self):
-        boxes = self.bounding_boxes.get("characters", [])
-        image = self.get_screenshot()
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    def read_characters(self, screenshot):
+        boxes = self.bounding_boxes.get("characters")
+        image = cv2.cvtColor(screenshot, cv2.COLOR_RGB2GRAY)
         _, image = cv2.threshold(image, 140, 255, cv2.THRESH_BINARY)
 
         left, top, right, bottom = boxes[0]
@@ -62,25 +84,25 @@ class App:
         whitelist = "ABCDEFGHIJKLMNOPQRSTUVWXYZl"
         
         # stitched = np.full((height, width*len(boxes)), 255)
-        labels = []
+        characters = []
         for i, box in enumerate(boxes):
             left, top, right, bottom = box
             cropped_image = image[top:bottom,left:right]
             # stitched[:,i*width:(i+1)*width] = cropped_image
-            label = pytesseract.image_to_string(cropped_image, lang="eng", config=f"--psm 10 -c tessedit_char_whitelist={whitelist}")
-            if not label:
-                label = ''
-            if label == 'l':
-                label = 'i'
-            if len(label) > 0:
-                label = label[0]
-            label = label.upper()
+            char = pytesseract.image_to_string(cropped_image, lang="eng", config=f"--psm 10 -c tessedit_char_whitelist={whitelist}")
+            if not char:
+                char = ''
+            if char == 'l':
+                char = 'i'
+            if len(char) > 0:
+                char = char[0]
+            char = char.upper()
             
-            labels.append(label)
+            characters.append(char)
 
         # label = pytesseract.image_to_string(stitched, lang="eng", config=f"--psm 7 -c tessedit_char_whitelist={whitelist}")
-        matrix = np.array(labels).reshape((4, 4))
-        return matrix
+        characters = np.array(characters).reshape((4, 4))
+        return characters
     
     def export_samples(self, ext="png"):
         image = self.get_screenshot()

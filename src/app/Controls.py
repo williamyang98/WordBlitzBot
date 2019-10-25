@@ -3,6 +3,7 @@ from PySide2 import QtGui, QtCore, QtWidgets
 import numpy as np
 import pyautogui
 import time
+from pprint import pprint
 
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = 0
@@ -11,14 +12,15 @@ class Controls(QtWidgets.QWidget):
     def __init__(self, parent, app):
         super().__init__(parent=parent)
         self.app = app
-        self.matrix = np.full((4, 4), '')
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.create_controls())
-        matrix_widget, self.matrix = self.create_matrix((4, 4))
+        matrix_widget, self.character_fields, self.bonus_fields = self.create_matrix((4, 4))
         layout.addWidget(matrix_widget)
 
         self.setLayout(layout)
+
+        
     
     def create_controls(self):
         group = QtWidgets.QGroupBox("Controls")
@@ -55,35 +57,53 @@ class Controls(QtWidgets.QWidget):
         layout = QtWidgets.QGridLayout()
 
         width, height = size
-        matrix = []
+
+        character_fields = []
+        bonus_fields = [] 
 
         for y in range(height):
-            row = []
             for x in range(width):
+                cell_group = QtWidgets.QGroupBox()
+                cell_layout = QtWidgets.QHBoxLayout()
+
                 text = QtWidgets.QLineEdit()
                 text.setText('')
-                layout.addWidget(text, y, x)
-                row.append(text)
-            matrix.append(row)
+
+                checkbox = QtWidgets.QCheckBox()
+                checkbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
+            
+                cell_layout.addWidget(text)
+                cell_layout.addWidget(checkbox)
+
+                character_fields.append(text)
+                bonus_fields.append(checkbox)
+
+                cell_group.setLayout(cell_layout)
+
+                layout.addWidget(cell_group, y, x)
         
         group.setLayout(layout)
-        return (group, matrix)
+        character_fields = np.array(character_fields).reshape((4, 4))
+        bonus_fields = np.array(bonus_fields).reshape((4, 4))
+        return group, character_fields, bonus_fields
 
     def on_read(self):
-        matrix = self.app.read_labels()
-        width, height = matrix.shape
+        characters, bonuses = self.app.read_data()
+        
+        width, height = characters.shape
         for x in range(width):
             for y in range(height):
-                char = matrix[y][x]
-                text = self.matrix[y][x]
+                char = characters[y][x]
+                text = self.character_fields[y][x]
                 text.setText(char)
+                
+                bonus = bonuses[y][x]
+                state = QtCore.Qt.CheckState.Checked if bonus else QtCore.Qt.CheckState.Unchecked
+                checkbox = self.bonus_fields[y][x]
+                checkbox.setCheckState(state)
 
-    def start_solve(self):
-        path = []
-        for x in range(4):
-            for y in range(4):
-                path.append((x, y))
-
+    
+    def get_coordinates(self):
         coordinates = []
         x_off, y_off = self.app.screen_rect.left, self.app.screen_rect.top
         for box in self.app.bounding_boxes['characters']:
@@ -92,19 +112,24 @@ class Controls(QtWidgets.QWidget):
             y = (top+bottom)/2 + y_off
             coordinates.append((x, y))
         coordinates = np.array(coordinates).reshape((4, 4, 2))
+        return coordinates
 
-        matrix = []
-        for y in range(4):
-            row = []
-            for x in range(4):
-                text = self.matrix[y][x]
-                char = text.text()
-                row.append(char.lower())
-            matrix.append(row)
-        matrix = np.array(matrix)
+    def start_solve(self):
+        coordinates = self.get_coordinates() 
 
+        @np.vectorize
+        def get_characters(text):
+            return text.text().lower()[:1] 
 
-        paths = self.app.solve_matrix(matrix)
+        @np.vectorize
+        def get_bonuses(checkbox):
+            bonus = int(checkbox.checkState() == QtCore.Qt.CheckState.Checked)
+            return bonus
+
+        characters = get_characters(self.character_fields)
+        bonuses = get_bonuses(self.bonus_fields)
+
+        paths = self.app.solve_matrix(characters)
 
         # TODO: Calculate score for each path and find best paths for each word
         # TODO: Incoporate other metadata (bonuses and value)
@@ -112,17 +137,28 @@ class Controls(QtWidgets.QWidget):
         filtered_paths = {}
 
         for word, path in paths:
-            if word in filtered_paths:
-                continue
-            filtered_paths[word] = path
+            additional_value = 0
+            for x, y in path:
+                bonus = bonuses[y][x]
+                additional_value += bonus 
+
+            total_value = len(word) + additional_value
+            if word not in filtered_paths:
+                filtered_paths[word] = (total_value, path)
+            else:
+                prev_value, _ = filtered_paths[word]
+                if total_value > prev_value:
+                    filtered_paths[word] = (total_value, path)
         
         filtered_path_list = []
-        for word, path in filtered_paths.items():
-            filtered_path_list.append((word, path))
-        
-        filtered_path_list = sorted(filtered_path_list, key=lambda x: len(x[0]), reverse=True)
+        for word, (total_value, path) in filtered_paths.items():
+            filtered_path_list.append((total_value, word, path))
 
-        for word, path in filtered_path_list:
+        filtered_path_list = sorted(filtered_path_list, key=lambda x: x[0], reverse=True)
+
+        pprint(filtered_path_list)
+
+        for value, word, path in filtered_path_list:
             self.solve_path(path, coordinates)
             time.sleep(0.04)
 
