@@ -35,7 +35,7 @@ is to CTRL-ALT-DELETE.
   * Missing valid words have to be manually added from the post game screen
 
 ## Demonstration
-[![Youtube](https://i.ytimg.com/vi/w3JqSKSbHvs/hqdefault.jpg)](http://www.youtube.com/watch?v=w3JqSKSbHvs "Demonstration")
+[![Demonstration](http://img.youtube.com/vi/SgWCdYiSb5Q/0.jpg)](http://www.youtube.com/watch?v=SgWCdYiSb5Q "Demonstration")
 
 ## Gallery
 ![alt text](docs/window.png "Main window")
