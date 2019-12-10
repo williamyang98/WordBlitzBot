@@ -13,43 +13,35 @@ class Editor(QtWidgets.QWidget):
     def create_screen_sliders(self):
         slider_group = QtWidgets.QGroupBox("Screen rect")
 
-        layout = QtWidgets.QVBoxLayout()
+        layout = QtWidgets.QHBoxLayout()
 
-        left_label = QtWidgets.QLabel("Left")
-        left_slider = QtWidgets.QSpinBox()
-        left_slider.setRange(0, 1920)
-        left_slider.setValue(self.app.screen_rect.left)
-        layout.addWidget(left_label)
-        layout.addWidget(left_slider)
+        left = self.create_spinbox("Left", (0, 1920), self.app.screen_rect.left, self.app.screen_rect.set_left) 
+        top = self.create_spinbox("Top", (0, 1080), self.app.screen_rect.top, self.app.screen_rect.set_top) 
+        width = self.create_spinbox("Width", (0, 1920), self.app.screen_rect.width, self.app.screen_rect.set_width) 
+        height = self.create_spinbox("Height", (0, 1080), self.app.screen_rect.height, self.app.screen_rect.set_height) 
 
-        top_label = QtWidgets.QLabel("Top")
-        top_slider = QtWidgets.QSpinBox()
-        top_slider.setRange(0, 1080)
-        top_slider.setValue(self.app.screen_rect.top)
-        layout.addWidget(top_label)
-        layout.addWidget(top_slider)
-
-        width_label = QtWidgets.QLabel("Width")
-        width_slider = QtWidgets.QSpinBox()
-        width_slider.setRange(0, 1080)
-        width_slider.setValue(self.app.screen_rect.width)
-        layout.addWidget(width_label)
-        layout.addWidget(width_slider)
-
-        height_label = QtWidgets.QLabel("Height")
-        height_slider = QtWidgets.QSpinBox()
-        height_slider.setRange(0, 1080)
-        height_slider.setValue(self.app.screen_rect.height)
-        layout.addWidget(height_label)
-        layout.addWidget(height_slider)
+        layout.addWidget(left)
+        layout.addWidget(top)
+        layout.addWidget(width)
+        layout.addWidget(height)
 
         slider_group.setLayout(layout)
 
-        QtCore.QObject.connect(left_slider, QtCore.SIGNAL("valueChanged(int)"), self.app.screen_rect.set_left)
-        QtCore.QObject.connect(top_slider, QtCore.SIGNAL("valueChanged(int)"), self.app.screen_rect.set_top)
-        QtCore.QObject.connect(width_slider, QtCore.SIGNAL("valueChanged(int)"), self.app.screen_rect.set_width)
-        QtCore.QObject.connect(height_slider, QtCore.SIGNAL("valueChanged(int)"), self.app.screen_rect.set_height)
-
         return slider_group
+
+    def create_spinbox(self, name, range, value, listener):
+        group = QtWidgets.QGroupBox(name)
+        layout = QtWidgets.QHBoxLayout()
+
+        slider = QtWidgets.QSpinBox()
+        slider.setRange(range[0], range[1])
+        slider.setValue(value)
+
+        layout.addWidget(slider)
+        group.setLayout(layout)
+
+        QtCore.QObject.connect(slider, QtCore.SIGNAL("valueChanged(int)"), listener)
+
+        return group
 
 

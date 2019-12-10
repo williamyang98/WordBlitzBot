@@ -12,6 +12,7 @@ class Controls(QtWidgets.QWidget):
     def __init__(self, parent, app):
         super().__init__(parent=parent)
         self.app = app
+        self.delay = 35 
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.create_controls())
@@ -24,7 +25,7 @@ class Controls(QtWidgets.QWidget):
     
     def create_controls(self):
         group = QtWidgets.QGroupBox("Controls")
-        layout = QtWidgets.QVBoxLayout()
+        layout = QtWidgets.QHBoxLayout()
 
         read_button = QtWidgets.QPushButton()
         read_button.setText("Read")
@@ -43,14 +44,35 @@ class Controls(QtWidgets.QWidget):
         override_checkbox.setCheckState(QtCore.Qt.CheckState.Checked if self.app.override_export else QtCore.Qt.CheckState.Unchecked)
         QtCore.QObject.connect(override_checkbox, QtCore.SIGNAL("stateChanged(int)"), self.on_override_change)
 
+        delay_slider = self.create_delay_slider() 
+
 
         layout.addWidget(read_button)
         layout.addWidget(solve_button)
+        layout.addWidget(delay_slider)
         # layout.addWidget(export_button)
         # layout.addWidget(override_label)
         # layout.addWidget(override_checkbox)
         group.setLayout(layout)
         return group
+    
+    def create_delay_slider(self):
+        group = QtWidgets.QGroupBox("Delay")
+        layout = QtWidgets.QHBoxLayout()
+
+        slider = QtWidgets.QSpinBox()
+        slider.setRange(0, 100)
+        slider.setValue(self.delay)
+
+        layout.addWidget(slider)
+        group.setLayout(layout)
+
+        QtCore.QObject.connect(slider, QtCore.SIGNAL("valueChanged(int)"), self.set_delay)    
+
+        return group
+
+    def set_delay(self, delay):
+        self.delay = delay
 
     def create_matrix(self, size):
         group = QtWidgets.QGroupBox("Matrix")
@@ -160,7 +182,7 @@ class Controls(QtWidgets.QWidget):
 
         for value, word, path in filtered_path_list:
             self.solve_path(path, coordinates)
-            time.sleep(0.04)
+            time.sleep(self.delay/1000)
 
     def solve_path(self, path, coordinates):
         x, y = path[0]
@@ -168,12 +190,10 @@ class Controls(QtWidgets.QWidget):
         pyautogui.moveTo(x, y)
         pyautogui.mouseDown()
 
-        delay = 0.04
-
         for i, j in path[1:]:
             x, y = coordinates[j][i]
             pyautogui.moveTo(x, y)
-            time.sleep(delay)
+            time.sleep(self.delay/1000)
 
         pyautogui.mouseUp()
 

@@ -27,8 +27,9 @@ def main():
     app = App(bounding_boxes, screen_rect)
     app.args = args
 
-    QtWidgets.QApplication.setStyle("fusion")
     qt_app = QtWidgets.QApplication([])
+    qt_app.setStyle("fusion")
+    # qt_app.setStyleSheet("QGroupBox{padding-top:15rem; margin-top:-15rem}")
 
     def on_press(key):
         if key == Key.f3:
@@ -47,6 +48,7 @@ def main():
 
     window = MainWindow(app)
     window.show()
+
 
     # key_listener.join()
     # word_tree_thread.join()
