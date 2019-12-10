@@ -2,7 +2,8 @@ def load_bounding_boxes(filepath):
     bounding_boxes = {
         'characters': [],
         'values': [],
-        'bonuses': []
+        'bonuses': [],
+        'window': []
     }
 
     current_boxes = None
