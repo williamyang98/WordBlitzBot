@@ -1,16 +1,3 @@
-from .word_tree import WordTree
- 
-def load_tree(filepath):
-    tree = WordTree()
-    with open(filepath, "r") as file:
-        for i, word in enumerate(file.readlines()):
-            word = word.strip()
-            tree.add_word(word)
-            print(f"{i} {word}", end="\r")
-        print()
-
-    return tree
-
 def load_bounding_boxes(filepath):
     bounding_boxes = {
         'characters': [],

@@ -43,10 +43,10 @@ class App:
         return image
     
     def solve_matrix(self, matrix):
-        if self.word_tree is None:
-            print("Word tree not loaded in yet")
+        if self.dictionary is None:
+            print("Dictionary not loaded in yet")
             return []
-        result = search_entire_matrix(matrix, self.word_tree)
+        result = search_entire_matrix(matrix, self.dictionary)
         return result
 
     def read_data(self):
