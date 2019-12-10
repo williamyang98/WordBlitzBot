@@ -34,5 +34,10 @@ is to CTRL-ALT-DELETE.
   * Invalid words can be detected from the game (lack of +score indicator above grid)
   * Missing valid words have to be manually added from the post game screen
 
+## Demonstration
+[![Demonstration](http://img.youtube.com/vi/SgWCdYiSb5Q/0.jpg)](http://www.youtube.com/watch?v=SgWCdYiSb5Q "Demonstration")
+
 ## Gallery
 ![alt text](docs/window.png "Main window")
+
+
