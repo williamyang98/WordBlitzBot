@@ -5,7 +5,11 @@ import threading
 import pytesseract
 import os
 
+import keras
+
 from src.matrix_search import search_entire_matrix
+
+from src.models import Matrix
 
 class App:
     def __init__(self, bounding_boxes, screen_rect):
@@ -19,6 +23,10 @@ class App:
         self.preview_thread_lock = threading.RLock()
 
         self.word_tree = None
+        self.matrix = Matrix()
+
+        self.model = keras.models.load_model("assets/models/characters.h5")
+        self.bonuses_model = keras.models.load_model("assets/models/bonuses.h5")
 
 
     def take_screenshot(self):
@@ -34,40 +42,57 @@ class App:
             'height': self.screen_rect.height
         }
 
+        _, _, width, height = self.bounding_boxes.get("window")[0]
+
         with mss.mss() as screen:
             image = screen.grab(monitor)
         
         image = np.array(image)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.cvtColor(image, cv2.COLOR_BGRA2BGR)
+        image = cv2.resize(image, (height, width))
 
         return image
     
-    def solve_matrix(self, matrix):
+    def solve_matrix(self):
         if self.dictionary is None:
             print("Dictionary not loaded in yet")
             return []
-        result = search_entire_matrix(matrix, self.dictionary)
+        result = search_entire_matrix(self.matrix.get_characters(), self.dictionary)
         return result
 
     def read_data(self):
         screenshot = self.get_screenshot()
-        bonuses = self.read_bonuses(screenshot)
+        # image = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
+        # bonuses = self.read_bonuses(screenshot)
         characters = self.read_characters(screenshot)
-
-        return (characters, bonuses)
+        bonuses = self.read_bonuses(screenshot)
+        for index in np.ndindex(4, 4):
+            char = characters[index]
+            bonus = bonuses[index]
+            cell = self.matrix.cells[index]
+            cell.setChar(char)
+            cell.setBonus(bonus)
+            cell.setValue(1)
 
     def read_bonuses(self, screenshot):
         boxes = self.bounding_boxes.get("bonuses")
-        image = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
-        _, image = cv2.threshold(image, 100, 255, cv2.THRESH_BINARY)
+        # image = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
+        image = screenshot
 
-        bonuses = []
+        images = []
         for box in boxes:
             left, top, right, bottom = box
             cropped_image = image[top:bottom,left:right]
-            total_white = (cropped_image < 120).sum()
-            bonus = int(total_white < 5)
-            bonuses.append(bonus)
+            images.append(cropped_image)
+        
+        images = np.array(images)
+        predictions = self.bonuses_model.predict(images)
+
+        # {'1X': 0, '2L': 1, '2W': 2, '3L': 3, '3W': 4}
+        mapping = [' ', '2L', '2W', '3L', '3W']
+        map_indices = np.argmax(predictions, axis=1)
+        bonuses = list((mapping[i] for i in map_indices))
 
         bonuses = np.array(bonuses).reshape((4, 4))
         return bonuses
@@ -75,30 +100,27 @@ class App:
     
     def read_characters(self, screenshot):
         boxes = self.bounding_boxes.get("characters")
-        image = cv2.cvtColor(screenshot, cv2.COLOR_RGB2GRAY)
-        _, image = cv2.threshold(image, 140, 255, cv2.THRESH_BINARY)
+        # image = cv2.cvtColor(screenshot, cv2.COLOR_RGB2GRAY)
+        image = screenshot
+        # _, image = cv2.threshold(image, 140, 255, cv2.THRESH_BINARY)
 
         left, top, right, bottom = boxes[0]
-        width, height = right-left, bottom-top
+        # width, height = right-left, bottom-top
 
-        whitelist = "ABCDEFGHIJKLMNOPQRSTUVWXYZl"
+        # whitelist = "ABCDEFGHIJKLMNOPQRSTUVWXYZl"
         
         # stitched = np.full((height, width*len(boxes)), 255)
-        characters = []
+        images = []
         for i, box in enumerate(boxes):
             left, top, right, bottom = box
-            cropped_image = image[top:bottom,left:right]
-            # stitched[:,i*width:(i+1)*width] = cropped_image
-            char = pytesseract.image_to_string(cropped_image, lang="eng", config=f"--psm 10 -c tessedit_char_whitelist={whitelist}")
-            if not char:
-                char = ''
-            if char == 'l':
-                char = 'i'
-            if len(char) > 0:
-                char = char[0]
-            char = char.upper()
-            
-            characters.append(char)
+            cropped_image = image[top:bottom,left:right,]
+            images.append(cropped_image)
+
+        images = np.array(images)
+        predictions = self.model.predict(images)
+
+        character_indices = np.argmax(predictions, axis=1)
+        characters = list(map(lambda x: chr(x+ord('a')), character_indices)) 
 
         # label = pytesseract.image_to_string(stitched, lang="eng", config=f"--psm 7 -c tessedit_char_whitelist={whitelist}")
         characters = np.array(characters).reshape((4, 4))
@@ -106,19 +128,62 @@ class App:
     
     def export_samples(self, ext="png"):
         image = self.get_screenshot()
-        for key in self.bounding_boxes.keys():
-            boxes = self.bounding_boxes.get(key, [])
-            samples = self.get_bounding_boxes(image, boxes)
+        mappings = {
+            "bonuses": lambda cell: cell.bonus, 
+            "characters": lambda cell: cell.char, 
+            "values": lambda cell: cell.value, 
+        }
+        for category in ("bonuses", "characters", "values"):
+            boxes = self.bounding_boxes.get(category, [])
+            samples = self.get_ranged_bounding_boxes(image, boxes)
+            self.export_category_samples(category, samples, ext, mappings)
+
+
+
+    def export_category_samples(self, category, samples, ext, mappings):
+        header = ["filename", "category"]
+        labels_file = os.path.join(self.args.export, category, "labels.txt")
+        labels_created = os.path.exists(labels_file) and not self.override_export
+
+        mode = "a" if not self.override_export else "w+"
+
+        with open(labels_file, mode) as file:
+            if not labels_created:
+                file.write(" ".join(header)+"\n")
+
             i = 0
-            for sample in samples:
-                filename = os.path.join(self.args.export, key, f"sample_{i}.{ext}")
+            for index in np.ndindex(samples.shape[:2]):
+                current_samples = samples[index]
+                cell = self.matrix.cells[index]
+                for sample in current_samples:
+                    filename = os.path.join(self.args.export, category, f"sample_{i}.{ext}")
 
-                while not self.override_export and os.path.exists(filename):
+                    while not self.override_export and os.path.exists(filename):
+                        i += 1
+                        filename = os.path.join(self.args.export, category, f"sample_{i}.{ext}")
+
+                    cv2.imwrite(filename, sample)
+
+                    file.write(f"sample_{i}.{ext} {mappings[category](cell)}\n")
+
                     i += 1
-                    filename = os.path.join(self.args.export, key, f"sample_{i}.{ext}")
 
-                cv2.imwrite(filename, sample)
-                i += 1
+    
+    def get_ranged_bounding_boxes(self, image, boxes, variation=2):
+        samples = []
+        for box in boxes:
+            current_samples = []
+            for x_off in range(-variation, variation+1):
+                for y_off in range(-variation, variation+1):
+                    left, top, right, bottom = box
+                    sample = image[top+y_off:bottom+y_off, left+x_off:right+x_off, :]
+                    current_samples.append(sample)
+            samples.append(current_samples)
+
+        samples = np.array(samples)
+        new_shape = (4, 4) + samples.shape[1:] 
+        return samples.reshape(new_shape)
+
 
     def get_bounding_boxes(self, image, boxes):
         for box in boxes:
