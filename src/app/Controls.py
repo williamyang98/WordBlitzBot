@@ -50,9 +50,9 @@ class Controls(QtWidgets.QWidget):
         layout.addWidget(read_button)
         layout.addWidget(solve_button)
         layout.addWidget(delay_slider)
-        layout.addWidget(export_button)
-        layout.addWidget(override_label)
-        layout.addWidget(override_checkbox)
+        # layout.addWidget(export_button)
+        # layout.addWidget(override_label)
+        # layout.addWidget(override_checkbox)
         group.setLayout(layout)
         return group
     
@@ -152,25 +152,37 @@ class Controls(QtWidgets.QWidget):
         filtered_paths = {}
 
         bonuses = self.app.matrix.get_bonuses()
+        values = self.app.matrix.get_values()
 
         for word, path in paths:
-            additional_value = 0
+            total_value = 0
+            multiplier = 1
             for x, y in path:
                 bonus = bonuses[y][x]
-                if bonus != ' ':
-                    additional_value += 1 
+                value = values[y][x]
+                if bonus == '2L':
+                    total_value += 2*value
+                elif bonus == '3L':
+                    total_value += 3*value
+                elif bonus == '2W':
+                    multiplier *= 2
+                elif bonus == '3W':
+                    multiplier *= 3
+                else:
+                    total_value += value
+            
 
-            total_value = len(word) + additional_value
+            score = total_value * multiplier
             if word not in filtered_paths:
-                filtered_paths[word] = (total_value, path)
+                filtered_paths[word] = (score, path)
             else:
-                prev_value, _ = filtered_paths[word]
-                if total_value > prev_value:
-                    filtered_paths[word] = (total_value, path)
+                prev_score, _ = filtered_paths[word]
+                if score > prev_score:
+                    filtered_paths[word] = (score, path)
         
         filtered_path_list = []
-        for word, (total_value, path) in filtered_paths.items():
-            filtered_path_list.append((total_value, word, path))
+        for word, (score, path) in filtered_paths.items():
+            filtered_path_list.append((score, word, path))
 
         filtered_path_list = sorted(filtered_path_list, key=lambda x: x[0], reverse=True)
 
