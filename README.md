@@ -19,17 +19,17 @@ is to CTRL-ALT-DELETE.
   * Start off with longest words
 
 ## Todo
-* Implement custom deep neural nets to process the image 
-  * Tesseract OCR takes a long time for each image (250ms)
-  * Tesseract OCR has a low accuracy
+* ~~Implement custom deep neural nets to process the image~~
+  * ~~Tesseract OCR takes a long time for each image (250ms)~~
+  * ~~Tesseract OCR has a low accuracy~~
 * Use separate models for each of the types of boxes
-  * Main characters in the tiles (centre)
+  * ~~Main characters in the tiles (centre)~~
   * Value of the letter (top right)
-  * Bonus associated with tile (top left)
+  * ~~Bonus associated with tile (top left)~~
 * Implement a kill switch to toggle the bot
 * Decrease loading times (mainly constructing the word tree)
   * Remove invalid words
-  * Convert to a faster to load format (store word tree directly?)
+  * ~~Convert to a faster to load format (store as hashmap with branches)~~
 * Add learning where invalid words are pruned from word tree, and missing words are added
   * Invalid words can be detected from the game (lack of +score indicator above grid)
   * Missing valid words have to be manually added from the post game screen
