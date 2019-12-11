@@ -27,6 +27,7 @@ class App:
 
         self.model = keras.models.load_model("assets/models/characters.h5")
         self.bonuses_model = keras.models.load_model("assets/models/bonuses.h5")
+        self.values_model = keras.models.load_model("assets/models/values.h5")
 
 
     def take_screenshot(self):
@@ -58,7 +59,14 @@ class App:
         if self.dictionary is None:
             print("Dictionary not loaded in yet")
             return []
-        result = search_entire_matrix(self.matrix.get_characters(), self.dictionary)
+        characters = self.matrix.get_characters()
+        
+        @np.vectorize
+        def to_lower(x):
+            return x.lower()
+
+        characters = to_lower(characters)
+        result = search_entire_matrix(characters, self.dictionary)
         return result
 
     def read_data(self):
@@ -67,13 +75,15 @@ class App:
         # bonuses = self.read_bonuses(screenshot)
         characters = self.read_characters(screenshot)
         bonuses = self.read_bonuses(screenshot)
+        values = self.read_values(screenshot)
         for index in np.ndindex(4, 4):
             char = characters[index]
             bonus = bonuses[index]
+            value = values[index]
             cell = self.matrix.cells[index]
             cell.setChar(char)
             cell.setBonus(bonus)
-            cell.setValue(1)
+            cell.setValue(value)
 
     def read_bonuses(self, screenshot):
         boxes = self.bounding_boxes.get("bonuses")
@@ -87,7 +97,7 @@ class App:
             images.append(cropped_image)
         
         images = np.array(images)
-        predictions = self.bonuses_model.predict(images)
+        predictions = self.bonuses_model.predict(images/255.0)
 
         # {'1X': 0, '2L': 1, '2W': 2, '3L': 3, '3W': 4}
         mapping = [' ', '2L', '2W', '3L', '3W']
@@ -117,14 +127,29 @@ class App:
             images.append(cropped_image)
 
         images = np.array(images)
-        predictions = self.model.predict(images)
+        predictions = self.model.predict(images/255.0)
 
         character_indices = np.argmax(predictions, axis=1)
-        characters = list(map(lambda x: chr(x+ord('a')), character_indices)) 
+        characters = list(map(lambda x: chr(x+ord('A')), character_indices)) 
 
         # label = pytesseract.image_to_string(stitched, lang="eng", config=f"--psm 7 -c tessedit_char_whitelist={whitelist}")
         characters = np.array(characters).reshape((4, 4))
         return characters
+
+    def read_values(self, image):
+        boxes = self.bounding_boxes.get("values")
+        images = []
+        for i, box in enumerate(boxes):
+            left, top, right, bottom = box
+            cropped_image = image[top:bottom,left:right,]
+            images.append(cropped_image)
+
+        images = np.array(images)
+        predictions = self.values_model.predict(images/255.0)
+        values = np.argmax(predictions, axis=1)
+
+        values = np.array(values).reshape((4, 4))
+        return values
     
     def export_samples(self, ext="png"):
         image = self.get_screenshot()
@@ -169,7 +194,7 @@ class App:
                     i += 1
 
     
-    def get_ranged_bounding_boxes(self, image, boxes, variation=2):
+    def get_ranged_bounding_boxes(self, image, boxes, variation=1):
         samples = []
         for box in boxes:
             current_samples = []
