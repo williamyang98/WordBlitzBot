@@ -15,7 +15,16 @@ class Controls(QtWidgets.QWidget):
         self.delay = 35 
 
         layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self.create_controls())
+
+
+        hgroup = QtWidgets.QWidget(parent=self)
+        hlayout = QtWidgets.QHBoxLayout()
+        hlayout.addWidget(self.create_controls())
+        hlayout.addWidget(self.create_exporter())
+        hgroup.setLayout(hlayout)
+
+        layout.addWidget(hgroup)
+
         matrix_widget = self.create_matrix((4, 4))
         layout.addWidget(matrix_widget)
 
@@ -35,6 +44,20 @@ class Controls(QtWidgets.QWidget):
         solve_button.setText("Solve")
         QtCore.QObject.connect(solve_button, QtCore.SIGNAL("clicked()"), self.start_solve)
 
+        delay_slider = self.create_delay_slider() 
+
+        layout.addWidget(read_button)
+        layout.addWidget(solve_button)
+        layout.addWidget(delay_slider)
+        group.setLayout(layout)
+
+
+        return group
+    
+    def create_exporter(self):
+        group = QtWidgets.QGroupBox("Exporter")
+        layout = QtWidgets.QHBoxLayout()
+
         export_button = QtWidgets.QPushButton()
         export_button.setText("Export")
         QtCore.QObject.connect(export_button, QtCore.SIGNAL("clicked()"), self.on_export)
@@ -44,16 +67,12 @@ class Controls(QtWidgets.QWidget):
         override_checkbox.setCheckState(QtCore.Qt.CheckState.Checked if self.app.override_export else QtCore.Qt.CheckState.Unchecked)
         QtCore.QObject.connect(override_checkbox, QtCore.SIGNAL("stateChanged(int)"), self.on_override_change)
 
-        delay_slider = self.create_delay_slider() 
+        layout.addWidget(export_button)
+        layout.addWidget(override_label)
+        layout.addWidget(override_checkbox)
 
-
-        layout.addWidget(read_button)
-        layout.addWidget(solve_button)
-        layout.addWidget(delay_slider)
-        # layout.addWidget(export_button)
-        # layout.addWidget(override_label)
-        # layout.addWidget(override_checkbox)
         group.setLayout(layout)
+
         return group
     
     def create_delay_slider(self):
@@ -99,7 +118,7 @@ class Controls(QtWidgets.QWidget):
                 bonuses.currentTextChanged.connect(cell.setBonus)
                 cell.bonus_changed.connect(bonuses.setCurrentText)
                 value = QtWidgets.QSpinBox()
-                value.setRange(1, 20)
+                value.setRange(1, 99)
                 value.valueChanged.connect(cell.setValue)
                 cell.value_changed.connect(value.setValue)
                 value.setValue(1)
@@ -151,28 +170,38 @@ class Controls(QtWidgets.QWidget):
         # TODO: Show the list of solved words and their values in a list somewhere
         filtered_paths = {}
 
+        characters = self.app.matrix.get_characters()
         bonuses = self.app.matrix.get_bonuses()
         values = self.app.matrix.get_values()
 
         for word, path in paths:
             total_value = 0
             multiplier = 1
+            extra_values = 0
+            length = 0
+            total_vowels = 0
+
             for x, y in path:
                 bonus = bonuses[y][x]
-                value = values[y][x]
                 if bonus == '2L':
-                    total_value += 2*value
+                    extra_values += 2
                 elif bonus == '3L':
-                    total_value += 3*value
+                    extra_values += 3
                 elif bonus == '2W':
                     multiplier *= 2
                 elif bonus == '3W':
                     multiplier *= 3
-                else:
-                    total_value += value
-            
 
-            score = total_value * multiplier
+                value = values[y][x]
+                total_value += value
+                length += 1
+
+                char = characters[y][x]
+                if char in "AEIOU":
+                    total_vowels += 1 
+
+            score = (total_value)*multiplier + extra_values + length + total_vowels
+
             if word not in filtered_paths:
                 filtered_paths[word] = (score, path)
             else:
