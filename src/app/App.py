@@ -188,12 +188,47 @@ class App:
             "characters": lambda cell: cell.char, 
             "values": lambda cell: cell.value, 
         }
-        for category in ("bonuses", "characters", "values"):
+        for category in ("bonuses", "characters"):
             boxes = self.bounding_boxes.get(category, [])
             samples = self.get_ranged_bounding_boxes(image, boxes)
             self.export_category_samples(category, samples, ext, mappings)
+        
+        value_samples = self.get_ranged_bounding_boxes(image, self.bounding_boxes.get("values"))
+        self.export_values(value_samples, ext)
 
 
+    def export_values(self, samples, ext):
+        header = ["filename", "total_digits", "left_digit", "right_digit"]
+        labels_file = os.path.join(self.args.export, "values", "labels.txt")
+        labels_created = os.path.exists(labels_file) and not self.override_export
+
+        mode = "a" if not self.override_export else "w+"
+
+        with open(labels_file, mode) as file:
+            if not labels_created:
+                file.write(" ".join(header)+"\n")
+
+            i = 0
+            for index in np.ndindex(samples.shape[:2]):
+                current_samples = samples[index]
+                cell = self.matrix.cells[index]
+                for sample in current_samples:
+                    filename = os.path.join(self.args.export, "values", f"sample_{i}.{ext}")
+
+                    while not self.override_export and os.path.exists(filename):
+                        i += 1
+                        filename = os.path.join(self.args.export, "values", f"sample_{i}.{ext}")
+
+                    cv2.imwrite(filename, sample)
+
+                    value = cell.value
+                    total_digits = 2 if value >= 10 else 1
+                    left_digit = value//10
+                    right_digit = value - (left_digit*10)
+
+                    file.write(f"sample_{i}.{ext} {total_digits} {left_digit} {right_digit}\n")
+
+                    i += 1
 
     def export_category_samples(self, category, samples, ext, mappings):
         header = ["filename", "category"]
