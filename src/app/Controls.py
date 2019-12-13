@@ -5,6 +5,10 @@ import pyautogui
 import time
 from pprint import pprint
 
+import os
+import pandas as pd
+import cv2
+
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = 0
 
@@ -159,10 +163,7 @@ class Controls(QtWidgets.QWidget):
         coordinates = np.array(coordinates).reshape((4, 4, 2))
         return coordinates
 
-    def start_solve(self):
-        coordinates = self.get_coordinates() 
-        
-
+    def get_solve(self):
         paths = self.app.solve_matrix()
 
         # TODO: Calculate score for each path and find best paths for each word
@@ -215,6 +216,11 @@ class Controls(QtWidgets.QWidget):
 
         filtered_path_list = sorted(filtered_path_list, key=lambda x: x[0], reverse=True)
 
+        return filtered_path_list
+
+    def start_solve(self):
+        coordinates = self.get_coordinates() 
+        filtered_path_list = self.get_solve()
         pprint(filtered_path_list)
 
         for value, word, path in filtered_path_list:
@@ -235,7 +241,41 @@ class Controls(QtWidgets.QWidget):
         pyautogui.mouseUp()
 
     def on_export(self):
+        filtered_path_list = self.get_solve()
+
         self.app.export_samples()
+
+        i = 0
+        filepath_formatter = "assets/score_prediction/{folder}"
+
+        while os.path.exists(filepath_formatter.format(folder=i)):
+            i += 1
+
+        filepath = filepath_formatter.format(folder=i)         
+        os.mkdir(filepath)
+
+        # save scores
+        score_dataframe = pd.DataFrame(filtered_path_list, columns=["score", "word", "path"])
+        score_dataframe.to_csv(f"{filepath}/paths.csv", sep=" ")
+        # save picture of sample for reference
+        image = self.app.get_screenshot()
+        cv2.imwrite(f"{filepath}/sample.png", image)
+
+        # export the matrix data
+        matrix_data = []
+        matrix_header = ["index", "character", "value", "bonus"]
+        for index in np.ndindex((4, 4)):
+            cell = self.app.matrix.cells[index]            
+            value = cell.value
+            char = cell.char
+            bonus = cell.bonus
+            matrix_data.append([index, char, value, bonus])
+
+        matrix_dataframe = pd.DataFrame(matrix_data, columns=matrix_header)
+        matrix_dataframe.to_csv(f"{filepath}/matrix.csv", sep=" ")
+
+        print("Exported all data")
+
 
     def on_override_change(self, state):
         if state == QtCore.Qt.CheckState.Checked:
