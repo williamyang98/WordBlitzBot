@@ -13,6 +13,9 @@ class Matrix:
 
     def __str__(self):
         return str(self.cells)
+    
+    def get_cell(self, index):
+        return self.cells[index]
 
     def get_characters(self):
         cols, rows = self.shape

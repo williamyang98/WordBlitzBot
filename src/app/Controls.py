@@ -166,6 +166,8 @@ class Controls(QtWidgets.QWidget):
     def get_solve(self):
         paths = self.app.solve_matrix()
 
+        length_mapping = {2: 3, 3: 4, 4: 6, 5: 9, 6: 11, 7: 14}
+
         # TODO: Calculate score for each path and find best paths for each word
         # TODO: Incoporate other metadata (bonuses and value)
         # TODO: Show the list of solved words and their values in a list somewhere
@@ -176,32 +178,17 @@ class Controls(QtWidgets.QWidget):
         values = self.app.matrix.get_values()
 
         for word, path in paths:
-            total_value = 0
-            multiplier = 1
-            extra_values = 0
-            length = 0
-            total_vowels = 0
+            word_multipliers = 1
+            product_sum = 0 # letter value * letter multiplier
+            word_length = len(path)
 
-            for x, y in path:
-                bonus = bonuses[y][x]
-                if bonus == '2L':
-                    extra_values += 2
-                elif bonus == '3L':
-                    extra_values += 3
-                elif bonus == '2W':
-                    multiplier *= 2
-                elif bonus == '3W':
-                    multiplier *= 3
-
-                value = values[y][x]
-                total_value += value
-                length += 1
-
-                char = characters[y][x]
-                if char in "AEIOU":
-                    total_vowels += 1 
-
-            score = (total_value)*multiplier + extra_values + length + total_vowels
+            constant = length_mapping.get(word_length, 2*word_length)
+            
+            for character, value, letter_multiplier, word_multiplier in zip(*self.extract_metadata(path)):
+                word_multipliers *= word_multiplier
+                product_sum += value
+                    
+            score = (product_sum * word_multipliers) + constant
 
             if word not in filtered_paths:
                 filtered_paths[word] = (score, path)
@@ -217,6 +204,36 @@ class Controls(QtWidgets.QWidget):
         filtered_path_list = sorted(filtered_path_list, key=lambda x: x[0], reverse=True)
 
         return filtered_path_list
+    
+    def extract_metadata(self, path):
+        values = []
+        word_multipliers = []
+        letter_multipliers = []
+        characters = []
+        
+        for index in path:
+            cell = self.app.matrix.get_cell(index)
+            values.append(cell.value)
+            characters.append(cell.char)
+            
+            bonus = cell.bonus
+            if bonus == '3W':
+                word_multipliers.append(3)
+            elif bonus == '2W':
+                word_multipliers.append(2)
+            else:
+                word_multipliers.append(1)
+            
+            if bonus == '2L':
+                letter_multipliers.append(2)
+            elif bonus == '3L':
+                letter_multipliers.append(3)
+            else:
+                letter_multipliers.append(1)
+            
+            
+        
+        return characters, values, letter_multipliers, word_multipliers
 
     def start_solve(self):
         coordinates = self.get_coordinates() 
