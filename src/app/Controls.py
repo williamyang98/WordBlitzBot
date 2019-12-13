@@ -9,6 +9,8 @@ import os
 import pandas as pd
 import cv2
 
+from timeit import default_timer
+
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = 0
 
@@ -71,9 +73,15 @@ class Controls(QtWidgets.QWidget):
         override_checkbox.setCheckState(QtCore.Qt.CheckState.Checked if self.app.override_export else QtCore.Qt.CheckState.Unchecked)
         QtCore.QObject.connect(override_checkbox, QtCore.SIGNAL("stateChanged(int)"), self.on_override_change)
 
+
+        reload_button = QtWidgets.QPushButton()
+        reload_button.setText("Reload")
+        QtCore.QObject.connect(reload_button, QtCore.SIGNAL("clicked()"), self.on_reload)
+
         layout.addWidget(export_button)
         layout.addWidget(override_label)
         layout.addWidget(override_checkbox)
+        layout.addWidget(reload_button)
 
         group.setLayout(layout)
 
@@ -299,3 +307,13 @@ class Controls(QtWidgets.QWidget):
             self.app.override_export = True
         else:
             self.app.override_export = False
+
+    def on_reload(self):
+        from src.dictionary import DictionarySerialiser
+        dictionary_serialiser = DictionarySerialiser()
+
+        start = default_timer()
+        dictionary = dictionary_serialiser.load(self.app.args.dictionary)
+        self.app.dictionary = dictionary
+        end = default_timer()
+        print(f"Loaded dictionary in {end-start:.2f}s")
