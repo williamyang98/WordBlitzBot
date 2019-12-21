@@ -1,10 +1,12 @@
 from PySide2.QtCore import QObject, Property, Slot, Signal
+from PySide2 import QtCore
 
 import pyautogui
 import time
 from timeit import default_timer
 
 from .Trace import Trace
+from .TraceListModel import TraceListModel
 
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = 0
@@ -12,7 +14,6 @@ pyautogui.PAUSE = 0
 class Tracer(QObject):
     progress_changed = Signal(float)
     delay_changed = Signal(int)
-    traces_changed = Signal()
 
     def __init__(self, solver, preview, matrix):
         super().__init__()
@@ -21,7 +22,7 @@ class Tracer(QObject):
         self.preview = preview
         self.matrix = matrix
 
-        self.traces = []
+        self.trace_list = TraceListModel()
 
         self._progress = 0.0
 
@@ -36,16 +37,19 @@ class Tracer(QObject):
         self.traces = traces
         self.progress = 0.0
 
-        self.traces_changed.emit()
 
     def start(self):
         coordinates = self.preview.get_coordinates()
-        unsolved_traces = sorted(filter(lambda trace: not trace.is_complete, self.traces), reverse=True)
+        unsolved_traces = []
+        for index, trace in enumerate(self.traces):
+            if not trace.is_complete:
+                unsolved_traces.append((index, trace))
+
         solved_traces = 0
 
         self.running = True
 
-        for trace in unsolved_traces:
+        for index, trace in unsolved_traces:
             for i, position in enumerate(trace.path):
                 if not self.running:
                     return
@@ -53,10 +57,11 @@ class Tracer(QObject):
                 coordinate = coordinates[position]
                 x, y = coordinate
                 pyautogui.moveTo(x, y)
+
                 if i == 0:
                     pyautogui.mouseDown()
-                else:
-                    time.sleep(self.delay_ms / 1000)
+
+                time.sleep(self.delay_ms / 1000)
             
             pyautogui.mouseUp()
             solved_traces += 1
@@ -64,7 +69,12 @@ class Tracer(QObject):
             total_traces = len(self.traces)
             incomplete_traces = len(unsolved_traces) - solved_traces
             self.progress = incomplete_traces / total_traces 
-        
+
+            trace.is_complete = True
+
+            index = self.trace_list.index(index, 2)
+            self.trace_list.dataChanged.emit(index, index)
+
         self.running = False
 
     @property
@@ -85,7 +95,13 @@ class Tracer(QObject):
         self._delay_ms = delay_ms
         self.delay_changed.emit(delay_ms)
 
-
+    @property
+    def traces(self):
+        return self.trace_list.traces
+    
+    @traces.setter
+    def traces(self, traces):
+        self.trace_list.traces = traces
 
                 
 
