@@ -1,16 +1,9 @@
 from PySide2 import QtGui, QtCore, QtWidgets
 
-class TraceListWidget(QtWidgets.QListView):
+class TraceListWidget(QtWidgets.QTableView):
     def __init__(self, parent, tracer):
         super().__init__(parent=parent)
         self.tracer = tracer
 
-        self.model = QtCore.QStringListModel() 
-        self.setModel(self.model)
-
-        self.tracer.traces_changed.connect(self.on_traces_change)
-
-
-    def on_traces_change(self):
-        strings = [str(trace) for trace in self.tracer.traces]
-        self.model.setStringList(strings)
+        # self.setModel(MyListModel([1, 2, 3, 4]))
+        self.setModel(self.tracer.trace_list)
