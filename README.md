@@ -4,38 +4,28 @@ Can automatically solve a word blitz game. To run the program execute the follow
 ```
 python3 run_bot.py
 ```
-Press read to create the word matrix. If there are an incorrect characters, fix these up.
-Then press solve to automatically solve Word Blitz. For the time being, the only way to stop the program
-is to CTRL-ALT-DELETE.
+Press the following buttons:
+1. Read - Image recognition to read in matrix
+2. Calculate - Calculate all the best word combinations and their exact score
+3. Start - Begin execution of all words (User cannot do anything during this)
+
+For the time being, the only way to stop the program is to CTRL-ALT-DELETE.
 
 ## Completed
 * Autoclicking and dragging
+* Automatically reads all information on screen
 * Basic UI
-* Solver for word matrix
-* Parser for converting list of dictionary words into a tree
-* Cropping for all characters
-* Optimization to solve higher value words
-  * Detect if there is a bonus
-  * Start off with longest words
+* Finds best possible path for each word and shows them in a list
+* Fast loading time for the dictionary
+* Fast character/digit recognition using machine learning
+* HTML parser to extract missed words and invalid words
 
-## Todo
-* ~~Implement custom deep neural nets to process the image~~
-  * ~~Tesseract OCR takes a long time for each image (250ms)~~
-  * ~~Tesseract OCR has a low accuracy~~
-* ~~Use separate models for each of the types of boxes~~
-  * ~~Main characters in the tiles (centre)~~
-  * ~~Value of the letter (top right)~~
-  * ~~Bonus associated with tile (top left)~~
-* Implement a kill switch to toggle the bot
-* Decrease loading times (mainly constructing the word tree)
-  * Remove invalid words
-  * ~~Convert to a faster to load format (store as hashmap with branches)~~
-* Add learning where invalid words are pruned from word tree, and missing words are added
-  * Invalid words can be detected from the game (lack of +score indicator above grid)
-  * Missing valid words have to be manually added from the post game screen
+## TODO
+* Keep perfecting the dictionary
+* Freeze the tensorflow models for faster loading
 
-## Demonstration
-[![Demonstration](http://img.youtube.com/vi/SgWCdYiSb5Q/0.jpg)](http://www.youtube.com/watch?v=SgWCdYiSb5Q "Demonstration")
+## Old demonstration video
+[![Demonstration](http://img.youtube.com/vi/SgWCdYiSb5Q/0.jpg)](http://www.youtube.com/watch?v=SgWCdYiSb5Q "Old Demonstration")
 
 ## Gallery
 ![alt text](docs/window.png "Main window")
