@@ -58,14 +58,14 @@ class Analyser:
         images = self.preview.get_bonuses()
         predictions = self.bonuses_model.predict(images/255.0)
 
-        mapping = [' ', '2L', '2W', '3L', '3W']
+        mapping = [" ", "2L", "2W", "3L", "3W"]
 
         def convert_prediction(prediction):
             bonus_type = np.argmax(prediction)
             bonus = mapping[bonus_type]
             return bonus
 
-        bonuses = np.apply_along_axis(convert_prediction, 1, predictions)
+        bonuses = np.array([convert_prediction(pred) for pred in predictions])
         bonuses = bonuses.reshape(self.matrix.shape)
 
         return bonuses
