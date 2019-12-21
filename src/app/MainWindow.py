@@ -9,6 +9,7 @@ from .PreviewAdjusterWidget import PreviewAdjusterWidget
 from .AnalyserWidget import AnalyserWidget
 
 from .TraceListWidget import TraceListWidget
+from .HTMLDictionaryExtractorWidget import HTMLDictionaryExtractorWidget
 
 class MainWindow:
     def __init__(self, app):
@@ -20,6 +21,7 @@ class MainWindow:
         self.vertical_splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical, self.splitter)
         self.preview_widget = PreviewWidget(self.splitter, app.preview, app.thread_pool)
         self.trace_list_widget = TraceListWidget(self.splitter, app.tracer)
+        self.extractor_widget = HTMLDictionaryExtractorWidget(self.splitter, app.extractor)
 
         self.preview_adjuster_widget = PreviewAdjusterWidget(self.vertical_splitter, app.preview)
         self.tracer_widget = TracerWidget(self.vertical_splitter, app.tracer, app.thread_pool)

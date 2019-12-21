@@ -1,3 +1,5 @@
+from PySide2 import QtCore
+
 from .Matrix import Matrix
 from .Dictionary import Dictionary, DictionarySerialiser
 from .Exporter import Exporter
@@ -5,10 +7,10 @@ from .Preview import Preview
 from .Solver import Solver
 from .Tracer import Tracer
 from .Analyser import Analyser
-
-from PySide2 import QtCore
-from src.util import load_bounding_boxes
 from .ScreenRect import ScreenRect
+from .HTMLDictionaryExtractor import HTMLDictionaryExtractor
+
+from src.util import load_bounding_boxes
 
 class App(QtCore.QObject):
     def __init__(self):
@@ -27,7 +29,9 @@ class App(QtCore.QObject):
         self.analyser = Analyser(self.preview, self.matrix)
 
         self.tracer = Tracer(self.solver, self.preview, self.matrix)
-        self.exporter = Exporter(self.tracer, self.preview, self.matrix)
+        self.extractor = HTMLDictionaryExtractor(self.tracer, self.dictionary)
+
+        self.exporter = Exporter(self.tracer, self.preview, self.matrix, self.extractor)
 
         self.thread_pool = QtCore.QThreadPool(self)
 
