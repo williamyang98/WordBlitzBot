@@ -6,11 +6,13 @@ from .Solver import Solver
 from .Tracer import Tracer
 from .Analyser import Analyser
 
+from PySide2 import QtCore
 from src.util import load_bounding_boxes
 from .ScreenRect import ScreenRect
 
-class App:
+class App(QtCore.QObject):
     def __init__(self):
+        super().__init__()
         self.matrix = Matrix()
 
         self.dictionary_loader = DictionarySerialiser()
@@ -26,6 +28,8 @@ class App:
 
         self.tracer = Tracer(self.solver, self.preview, self.matrix)
         self.exporter = Exporter(self.tracer, self.preview, self.matrix)
+
+        self.thread_pool = QtCore.QThreadPool(self)
 
 
 

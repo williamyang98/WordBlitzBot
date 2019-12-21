@@ -1,10 +1,14 @@
 from PySide2 import QtGui, QtCore, QtWidgets
 import cv2
+import time
+
+from src.models import LambdaRunner
 
 class PreviewWidget(QtWidgets.QLabel):
-    def __init__(self, parent, preview):
+    def __init__(self, parent, preview, thread_pool):
         super().__init__(parent=parent)
         self.preview = preview
+        self.thread_pool = thread_pool
 
         self.colour_map = {
             "characters":   (255, 0, 0),
@@ -12,14 +16,16 @@ class PreviewWidget(QtWidgets.QLabel):
             "values":       (0, 0, 255),
         }
 
-        self.timer = QtCore.QTimer(self)
-        self.timer.setSingleShot(False)
-        self.timer.start(25)
-
-        self.timer.timeout.connect(self.update)
-
         self.panning = False
         self._last_position = QtCore.QPoint(0, 0)
+
+        @LambdaRunner
+        def start_runner():
+            while True:
+                self.update()
+                time.sleep(25 / 1000)
+
+        self.thread_pool.start(start_runner)
     
     def update(self):
         preview = self.preview.take_screenshot()

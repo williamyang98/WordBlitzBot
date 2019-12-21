@@ -1,7 +1,8 @@
 from PySide2 import QtGui, QtCore, QtWidgets
+from PySide2 import QtCore
 
 class TracerWidget(QtWidgets.QWidget):
-    def __init__(self, parent, tracer):
+    def __init__(self, parent, tracer, thread_pool):
         super().__init__(parent=parent)
         self.tracer = tracer
 
@@ -13,7 +14,7 @@ class TracerWidget(QtWidgets.QWidget):
 
         start_button = QtWidgets.QPushButton()
         start_button.setText("Start")
-        start_button.clicked.connect(self.tracer.start)
+        start_button.clicked.connect(self.start_threaded_trace)
 
         delay_slider = QtWidgets.QSpinBox()
         delay_slider.setRange(0, 1000)
@@ -26,4 +27,23 @@ class TracerWidget(QtWidgets.QWidget):
         layout.addWidget(delay_slider)
 
         self.setLayout(layout)
+
+        self.thread_pool = thread_pool
+
+    def start_threaded_trace(self):
+        tracer_runner = TracerRunner(self.tracer)
+        self.thread_pool.start(tracer_runner)
+
+class TracerRunner(QtCore.QRunnable):
+    def __init__(self, tracer):
+        super().__init__()
+        self.tracer = tracer
+    
+    def run(self):
+        self.tracer.start()
+
+    def autoDelete(self):
+        return False
+
+    
 

@@ -2,7 +2,7 @@
 from PySide2 import QtGui, QtCore, QtWidgets
 
 class ExporterWidget(QtWidgets.QWidget):
-    def __init__(self, parent, exporter):
+    def __init__(self, parent, exporter, thread_pool):
         super().__init__(parent=parent)
         self.exporter = exporter
 
@@ -10,7 +10,7 @@ class ExporterWidget(QtWidgets.QWidget):
 
         export_button = QtWidgets.QPushButton()
         export_button.setText("Export")
-        export_button.clicked.connect(self.exporter.export)
+        export_button.clicked.connect(self.on_export)
 
         override_label = QtWidgets.QLabel("Override")
         override_checkbox = QtWidgets.QCheckBox()
@@ -23,9 +23,26 @@ class ExporterWidget(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
+        self.thread_pool = thread_pool
+
     def on_override_change(self, state):
         if state == QtCore.Qt.CheckState.Checked:
             self.exporter.override = True
         else:
             self.exporter.override = False
 
+    def on_export(self):
+        exporter_runner = ExporterRunner(self.exporter)
+        self.thread_pool.start(exporter_runner)
+
+
+class ExporterRunner(QtCore.QRunnable):
+    def __init__(self, exporter):
+        super().__init__()
+        self.exporter = exporter
+    
+    def run(self):
+        self.exporter.export()
+
+    def autoDelete(self):
+        return False
