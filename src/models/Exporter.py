@@ -5,26 +5,30 @@ import pandas as pd
 import csv
 
 class Exporter:
-    def __init__(self, tracer, preview, matrix):
+    def __init__(self, tracer, preview, matrix, extractor):
         self.tracer = tracer
         self.preview = preview
         self.matrix = matrix
+        self.extractor = extractor
 
         self.override = False
         self.directory = "assets/"
 
-    def export(self):
+    def export_image_data(self):
         image = self.preview.preview
         self.export_samples(image)
         self.export_characters(image)
         self.export_bonuses(image)
         self.export_values(image)
 
+    
+    def export_metadata(self):
         directory_sampler = SampleFilepathFinder(os.path.join(self.directory, "data", "traces", "{i}"))
         directory = directory_sampler.get_filepath()
         os.makedirs(directory)
         self.export_matrix(directory)
         self.export_traces(directory)
+        self.export_results(directory)
 
     def export_samples(self, image, ext="png"):
         formatter = os.path.join(self.directory, "samples", f"sample_{{i}}.{ext}")
@@ -131,6 +135,10 @@ class Exporter:
         matrix_dataframe = pd.DataFrame(matrix_data, columns=matrix_header)
         matrix_dataframe.to_csv(os.path.join(directory, "matrix.csv"), sep=" ", index=False)
     
+    def export_results(self, directory):
+        with open(os.path.join(directory, "results.html"), "w+") as fp:
+            fp.write(self.extractor.text)
+
     def get_ranged_bounding_boxes(self, image, boxes, variation=1):
         samples = []
         for box in boxes:
