@@ -59,4 +59,16 @@ class TraceListModel(QtCore.QAbstractTableModel):
         self._traces = traces
         self.endResetModel()
 
+        for i, trace in enumerate(self._traces):
+            listener = TraceListener(i, self)
+            trace.is_complete_changed.connect(listener)
 
+@Slot(bool)
+class TraceListener:
+    def __init__(self, i, model):
+        self.i = i
+        self.model = model
+
+    def __call__(self, is_complete):
+        index = self.model.index(self.i, 2)
+        self.model.dataChanged.emit(index, index)

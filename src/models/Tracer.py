@@ -72,9 +72,6 @@ class Tracer(QObject):
 
             trace.is_complete = True
 
-            index = self.trace_list.index(index, 2)
-            self.trace_list.dataChanged.emit(index, index)
-
         self.running = False
 
     @property
