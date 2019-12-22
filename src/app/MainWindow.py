@@ -4,30 +4,42 @@ from .PreviewWidget import PreviewWidget
 
 from .MatrixWidget import MatrixWidget
 from .ExporterWidget import ExporterWidget
-from .TracerWidget import TracerWidget
+from .ControlsWidget import ControlsWidget
 from .PreviewAdjusterWidget import PreviewAdjusterWidget
-from .AnalyserWidget import AnalyserWidget
 
 from .TraceListWidget import TraceListWidget
 from .HTMLDictionaryExtractorWidget import HTMLDictionaryExtractorWidget
 
-class MainWindow:
+class MainWindow(QtWidgets.QSplitter):
     def __init__(self, app):
+        super().__init__()
         self.app = app
+        self.setWindowTitle("Word Blitz Bot")
 
-        self.splitter = QtWidgets.QSplitter()
-        self.splitter.setWindowTitle("Word Blitz Bot")
+        left_panel = self.create_left_panel()
+        preview_widget = PreviewWidget(None, self.app.preview, self.app.thread_pool)
+        trace_list_widget = TraceListWidget(None, self.app.tracer)
+        extractor_widget = HTMLDictionaryExtractorWidget(None, self.app.extractor)
 
-        self.vertical_splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical, self.splitter)
-        self.preview_widget = PreviewWidget(self.splitter, app.preview, app.thread_pool)
-        self.trace_list_widget = TraceListWidget(self.splitter, app.tracer)
-        self.extractor_widget = HTMLDictionaryExtractorWidget(self.splitter, app.extractor)
+        self.addWidget(left_panel)
+        self.addWidget(preview_widget)
+        self.addWidget(trace_list_widget)
+        self.addWidget(extractor_widget)
 
-        self.preview_adjuster_widget = PreviewAdjusterWidget(self.vertical_splitter, app.preview)
-        self.tracer_widget = TracerWidget(self.vertical_splitter, app.tracer, app.thread_pool)
-        self.exporter_widget = ExporterWidget(self.vertical_splitter, app.exporter, app.thread_pool)
-        self.analyser_widget = AnalyserWidget(self.vertical_splitter, app.analyser)
-        self.matrix_widget = MatrixWidget(self.vertical_splitter, app.matrix)
+    def create_left_panel(self):
+        group = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout()
 
-    def show(self):
-        self.splitter.show()
+        preview_adjuster_widget = PreviewAdjusterWidget(None, self.app.preview)
+        tracer_widget = ControlsWidget(None, self.app.tracer, self.app.analyser, self.app.thread_pool)
+        exporter_widget = ExporterWidget(None, self.app.exporter, self.app.thread_pool)
+        matrix_widget = MatrixWidget(None, self.app.matrix)
+
+        layout.addWidget(preview_adjuster_widget)
+        layout.addWidget(tracer_widget)
+        layout.addWidget(exporter_widget)
+        layout.addWidget(matrix_widget)
+
+        group.setLayout(layout)
+
+        return group

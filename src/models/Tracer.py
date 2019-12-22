@@ -68,7 +68,7 @@ class Tracer(QObject):
 
             total_traces = len(self.traces)
             incomplete_traces = len(unsolved_traces) - solved_traces
-            self.progress = incomplete_traces / total_traces 
+            self.progress = (total_traces-incomplete_traces) / total_traces 
 
             trace.is_complete = True
 
