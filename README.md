@@ -28,6 +28,6 @@ For the time being, the only way to stop the program is to CTRL-ALT-DELETE.
 [![Demonstration](http://img.youtube.com/vi/SgWCdYiSb5Q/0.jpg)](http://www.youtube.com/watch?v=SgWCdYiSb5Q "Old Demonstration")
 
 ## Gallery
-![alt text](docs/window.png "Main window")
+![alt text](docs/window_v2.png "Main window")
 
 
