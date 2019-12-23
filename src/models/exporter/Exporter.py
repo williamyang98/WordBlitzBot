@@ -79,7 +79,7 @@ class Exporter:
                 filename = os.path.basename(filepath)
                 cv2.imwrite(filepath, sample)
 
-                writer.writerow(mode.get_row(filepath, cell))
+                writer.writerow(mode.get_row(filename, cell))
 
         fp.close()
 
