@@ -2,17 +2,17 @@ from PySide2 import QtCore
 from PySide2.QtCore import Slot, Signal, Property
 
 import lxml.html
-from src.models import DictionarySerialiser
+from .dictionary import DictionarySerialiser
 
 from pprint import pprint
 
 class HTMLDictionaryExtractor:
-    def __init__(self, tracer, dictionary):
+    def __init__(self, tracer, dictionary, config):
         self.text = ""
         self.tracer = tracer
         self.dictionary = dictionary
 
-        self.dictionary_filepath = "assets/dictionaries/dictionary.pickle"
+        self.dictionary_filepath = config["dictionary"]
         self.dictionary_loader = DictionarySerialiser()
 
         self.add_word_list = WordList()
