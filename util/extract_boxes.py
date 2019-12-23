@@ -3,7 +3,7 @@ import argparse
 import os
 import cv2
 
-from src.bounding_boxes import get_bounding_boxes
+from .bounding_boxes import get_bounding_boxes
 
 def main():
     parser = argparse.ArgumentParser()
