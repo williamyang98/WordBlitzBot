@@ -8,11 +8,10 @@ class ScreenRect(QObject):
 
     def __init__(self, rect):
         super().__init__()
-        left, top, width, height = rect
-        self.set_left(left)
-        self.set_top(top)
-        self.set_width(width)
-        self.set_height(height)
+        self.set_left(rect["left"])
+        self.set_top(rect["top"])
+        self.set_width(rect["width"])
+        self.set_height(rect["height"])
 
     @Property(int, notify=left_changed)
     def left(self):

@@ -1,0 +1,34 @@
+bounding_boxes: assets\bounding_boxes.txt
+dictionary: assets\dictionaries\dictionary.pickle
+exporter:
+  image_data:
+    bonuses:
+      filename: sample_{i}.png
+      labels: assets\data\bonuses\labels.txt
+      output_dir: assets\data\bonuses
+    characters:
+      filename: sample_{i}.png
+      labels: assets\data\characters\labels.txt
+      output_dir: assets\data\characters
+    samples:
+      filename: sample_{i}.png
+      output_dir: assets\samples
+    values:
+      filename: sample_{i}.png
+      labels: assets\data\values\labels.txt
+      output_dir: assets\data\values
+  metadata:
+    files:
+      matrix: matrix.csv
+      results: results.html
+      traces: traces.csv
+    output_dir: assets\data\traces\{i}
+models:
+  bonuses: assets\models\bonuses.h5
+  characters: assets\models\characters.h5
+  values: assets\models\two_digit_classifier.h5
+screen_rect:
+  height: 440
+  left: 526
+  top: 422
+  width: 438

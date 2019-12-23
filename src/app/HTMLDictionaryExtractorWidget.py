@@ -1,4 +1,5 @@
 from PySide2 import QtGui, QtCore, QtWidgets
+from PySide2.QtCore import Slot, Signal
 
 class HTMLDictionaryExtractorWidget(QtWidgets.QWidget):
     def __init__(self, parent, extractor):
@@ -74,8 +75,14 @@ class HTMLDictionaryExtractorWidget(QtWidgets.QWidget):
         group.setTitle(title)
         layout = QtWidgets.QHBoxLayout()
 
+        @Slot(int)
+        def title_callback(list_size):
+            group.setTitle(f"{title} ({list_size})")
+
         list_view = QtWidgets.QListView()
         list_view.setModel(model)
+
+        model.list_size_changed.connect(title_callback)
 
         layout.addWidget(list_view)
         group.setLayout(layout)

@@ -1,17 +1,18 @@
 from PySide2 import QtCore
+from PySide2.QtCore import Slot, Signal, Property
 
 import lxml.html
-from src.models import DictionarySerialiser
+from .dictionary import DictionarySerialiser
 
 from pprint import pprint
 
 class HTMLDictionaryExtractor:
-    def __init__(self, tracer, dictionary):
+    def __init__(self, tracer, dictionary, config):
         self.text = ""
         self.tracer = tracer
         self.dictionary = dictionary
 
-        self.dictionary_filepath = "assets/dictionaries/dictionary.pickle"
+        self.dictionary_filepath = config["dictionary"]
         self.dictionary_loader = DictionarySerialiser()
 
         self.add_word_list = WordList()
@@ -66,6 +67,8 @@ class HTMLDictionaryExtractor:
         return words
 
 class WordList(QtCore.QAbstractListModel):
+    list_size_changed = Signal(int)
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self._words = []
@@ -93,6 +96,12 @@ class WordList(QtCore.QAbstractListModel):
     def words(self, words):
         self.beginResetModel()
         self._words = words
+        self.list_size_changed.emit(len(self._words))
         self.endResetModel()
+
+    @property
+    def list_size(self):
+        return len(self.words)
+    
 
     

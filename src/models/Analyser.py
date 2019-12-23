@@ -3,13 +3,13 @@ import numpy as np
 
 # loads data into matrix
 class Analyser:
-    def __init__(self, preview, matrix):
+    def __init__(self, preview, matrix, config):
         self.preview = preview
         self.matrix = matrix
 
-        self.characters_model = keras.models.load_model("assets/models/characters.h5")
-        self.bonuses_model = keras.models.load_model("assets/models/bonuses.h5")
-        self.values_model = keras.models.load_model("assets/models/two_digit_classifier.h5")
+        self.characters_model = config["models"]["characters"]
+        self.bonuses_model = config["models"]["bonuses"]
+        self.values_model = config["models"]["values"]
     
     def read_matrix(self):
         characters = self.read_characters()
