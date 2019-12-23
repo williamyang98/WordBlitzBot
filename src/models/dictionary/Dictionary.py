@@ -1,5 +1,3 @@
-import pickle
-
 class Dictionary:
     def __init__(self, mapping={}):
         self.map = mapping
@@ -38,15 +36,3 @@ class Dictionary:
     def is_word(self, word):
         return self.is_branch(word) and self.map[word] is True
     
-class DictionarySerialiser:
-
-    def save(self, dictionary, path):
-        with open(path, 'wb') as f:
-            # Pickle the 'data' dictionary using the highest protocol available.
-            pickle.dump(dictionary.map, f, pickle.HIGHEST_PROTOCOL)
-    
-    def load(self, path):
-        with open(path, 'rb') as f:
-            mapping = pickle.load(f)
-            dictionary = Dictionary(mapping)
-            return dictionary
