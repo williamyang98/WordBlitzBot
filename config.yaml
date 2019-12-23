@@ -27,3 +27,8 @@ models:
   bonuses: assets\models\bonuses.h5
   characters: assets\models\characters.h5
   values: assets\models\two_digit_classifier.h5
+screen_rect:
+  height: 440
+  left: 526
+  top: 422
+  width: 438

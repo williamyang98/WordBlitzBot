@@ -25,8 +25,7 @@ class App(QtCore.QObject):
         self.dictionary = self.dictionary_loader.load(self.config["dictionary"])
 
         bounding_boxes = load_bounding_boxes(self.config["bounding_boxes"])
-        screen_rect = (526, 422, 438, 440)
-        screen_rect = ScreenRect(screen_rect)
+        screen_rect = ScreenRect(self.config["screen_rect"])
 
         self.preview = Preview(bounding_boxes, screen_rect)
         self.solver = Solver(self.dictionary)

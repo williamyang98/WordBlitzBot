@@ -1,5 +1,4 @@
 from schema import Schema, And, Use, Optional, SchemaError
-import keras
 import os
 
 from .defaults import default_dir
