@@ -5,7 +5,7 @@ import pyautogui
 import time
 from timeit import default_timer
 
-from .Trace import Trace
+from .Trace import Trace 
 from .TraceListModel import TraceListModel
 
 pyautogui.FAILSAFE = True
