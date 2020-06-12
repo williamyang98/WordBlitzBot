@@ -1,6 +1,19 @@
 # Word Blitz Bot
 Can automatically solve a word blitz game. To run the program execute the following command.
 
+## Installation
+1. You will need a install of python3 or above. [Download](https://www.python.org/downloads/).
+2. Install all the python dependencies by running ```pip install -r requirements.txt``` or ```pip3 install -r requirements.txt```.
+
+### Optional Installation Instructions
+If you want to keep your python install independent of any dependencies in this project, you can install a virtual environment.
+Before running step 2 which installs all dependencies, install virtualenv.
+1. Run ```pip3 install virtualenv```.
+2. Create virtual environment by running```virtualenv venv```.
+3. Activate the virtual environment by running ```venv/Scripts/activate.bat```. (Will vary depending on operating system).
+4. Once inside the virtual environment, run step 2 in installation.
+
+## Running
 ```
 python3 run_bot.py
 ```
@@ -9,7 +22,7 @@ Press the following buttons:
 2. Calculate - Calculate all the best word combinations and their exact score
 3. Start - Begin execution of all words (User cannot do anything during this)
 
-For the time being, the only way to stop the program is to CTRL-ALT-DELETE.
+For the time being, ***the only way to stop the program is to CTRL-ALT-DELETE***.
 
 ## Completed
 * Autoclicking and dragging
