@@ -8,19 +8,18 @@ Can automatically solve a word blitz game. To run the program execute the follow
 ### Optional Installation Instructions
 If you want to keep your python install independent of any dependencies in this project, you can install a virtual environment.
 Before running step 2 which installs all dependencies, install virtualenv.
-1. Run ```pip3 install virtualenv```.
+1. Run ```pip install virtualenv``` or ```pip3 install virtualenv```.
 2. Create virtual environment by running```virtualenv venv```.
 3. Activate the virtual environment by running ```venv/Scripts/activate.bat```. (Will vary depending on operating system).
 4. Once inside the virtual environment, run step 2 in installation.
 
 ## Running
-```
-python3 run_bot.py
-```
+```python run_bot.py``` or ```python3 run_bot.py```
+
 Press the following buttons:
-1. Read - Image recognition to read in matrix
-2. Calculate - Calculate all the best word combinations and their exact score
-3. Start - Begin execution of all words (User cannot do anything during this)
+1. Read - Image recognition to read in words
+2. Calculate - Calculate all the best word combinations and their exact score (Displays in list)
+3. Start - Begin execution of all words (Robot will take control over your mouse)
 
 For the time being, ***the only way to stop the program is to CTRL-ALT-DELETE***.
 
