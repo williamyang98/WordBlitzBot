@@ -1,5 +1,6 @@
 import keras
 import numpy as np
+import cv2
 
 # loads data into matrix
 class Analyser:
@@ -21,8 +22,14 @@ class Analyser:
             cell.setBonus(bonuses[index])
             cell.setValue(values[index])
 
+    def resize_images(self, images, shape):
+        h, w = shape
+        images = [cv2.resize(img, (w, h), interpolation=cv2.INTER_NEAREST) for img in images]
+        return np.array(images)
+
     def read_characters(self):
         images = self.preview.get_characters()
+        images = self.resize_images(images, (36, 36))
         predictions = self.characters_model.predict(images/255.0)
 
         def convert_prediction(prediction):
@@ -37,6 +44,7 @@ class Analyser:
 
     def read_values(self):
         images = self.preview.get_values()
+        images = self.resize_images(images, (17, 22))
         predictions = self.values_model.predict(images/255.0)
 
         def convert_prediction(prediction):
@@ -56,6 +64,7 @@ class Analyser:
     
     def read_bonuses(self):
         images = self.preview.get_bonuses()
+        images = self.resize_images(images, (15, 22))
         predictions = self.bonuses_model.predict(images/255.0)
 
         mapping = [" ", "2L", "2W", "3L", "3W"]

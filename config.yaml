@@ -28,7 +28,7 @@ models:
   characters: assets\models\characters.h5
   values: assets\models\two_digit_classifier.h5
 screen_rect:
-  height: 440
-  left: 526
-  top: 422
-  width: 438
+  height: 404
+  left: 752
+  top: 447
+  width: 406

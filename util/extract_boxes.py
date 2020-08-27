@@ -3,7 +3,7 @@ import argparse
 import os
 import cv2
 
-from .bounding_boxes import get_bounding_boxes
+from bounding_boxes import get_bounding_boxes
 
 def main():
     parser = argparse.ArgumentParser()
@@ -19,6 +19,9 @@ def main():
         write_boxes(file, "characters", overlay, (255, 0, 0))
         write_boxes(file, "bonuses", overlay, (0, 255, 0))
         write_boxes(file, "values", overlay, (0, 0, 255))
+        file.write("#begin WINDOW\n")
+        file.write(f"{' '.join(map(str, [0, 0, overlay.shape[1], overlay.shape[0]]))}\n")
+        file.write("#end\n")
     
 def write_boxes(file, name, image, colour):
     file.write(f"#begin {name.upper()}\n")
