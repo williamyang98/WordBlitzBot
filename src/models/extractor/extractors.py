@@ -4,7 +4,7 @@ import lxml.html
 def extract_words_v1(text):
     results_html = lxml.html.fromstring(text)
     
-    words = {}
+    words = []
     score_board = results_html.cssselect("div.points-result")
     if not score_board:
         return words
@@ -13,8 +13,8 @@ def extract_words_v1(text):
 
     for row in rows:
         word = row.cssselect("div.word")[0].text_content().lower()
-        points = int(row.cssselect("div.points")[0].cssselect("div.left")[0].text_content())
-        words[word] = points
+        # points = int(row.cssselect("div.points")[0].cssselect("div.left")[0].text_content())
+        words.append(word)
     
     return words
 

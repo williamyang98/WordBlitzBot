@@ -62,12 +62,29 @@ class ExtractorWidget(QtWidgets.QWidget):
         layout.addWidget(apply_button)
 
         group.setLayout(layout)
+
+        # highlight save button if dictionary changed
+        def on_dict_change(is_changed):
+            font = QtGui.QFont()
+            font.setBold(is_changed) 
+            save_button.setFont(font)
+            if not is_changed:
+                save_button.setText("Save")
+                save_button.setToolTip("Save changes to dictionary file")
+            else:
+                save_button.setText("Save*")
+                save_button.setToolTip("Unsaved changes to dictionary")
+
+        self.extractor.dictionary_changed.connect(on_dict_change)
+
         return group
     
     def create_word_lists(self):
         group = QtWidgets.QWidget()
         layout = QtWidgets.QHBoxLayout()
 
+        layout.addWidget(self.create_word_list("Trace list", self.extractor.trace_word_list))
+        layout.addWidget(self.create_word_list("Extracted list", self.extractor.extracted_word_list))
         layout.addWidget(self.create_word_list("Add list", self.extractor.add_word_list))
         layout.addWidget(self.create_word_list("Removed list", self.extractor.removed_word_list))
 
