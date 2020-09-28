@@ -1,3 +1,11 @@
+# Representation of our dictionary
+# stores string/boolean pairs
+# boolean represents if the word is a just a branch or a complete word
+# this is so we can determine if we use a key inside the dictionary as a word
+# dict[just a branch] = False
+# dict[word and maybe also a branch] = True
+
+# we explore the dictionary in a tree-like manner by exploring its children
 class Dictionary:
     def __init__(self, mapping={}):
         self.map = mapping
@@ -21,7 +29,12 @@ class Dictionary:
 
         # if it is a word, check that it has no branches, and remove
         self.map[word] = False 
+
+        # TODO: add multilanguage support
+        # by extending with more branches to search
+        # or by introducting an additional lookup to keep track of number of children
         for i in range(ord('a'), ord('z')+1):
+        # for i in range(ord('a'), ord('z')+1):
             c = chr(i)
             branch = word+c
             if self.is_branch(branch):

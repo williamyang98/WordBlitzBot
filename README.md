@@ -23,6 +23,17 @@ Press the following buttons:
 
 For the time being, ***the only way to stop the program is to CTRL-ALT-DELETE***.
 
+## Other languages support
+Right now there is only an English dictionary. To add your own dictionary, you can use
+```python3 util/build_dictionary.py <your file>```
+
+to create a pickled dictionary which you can load. Your file should be a basic text file, with your words on each new line.
+See (https://github.com/dwyl/english-words) as an example.
+
+***NOTE:*** 
+With the current way dictionaries are stored, only English words can be removed. 
+You can edit this for your own language in src/models/Dictionary.py on line 35.
+
 ## Completed
 * Autoclicking and dragging
 * Automatically reads all information on screen
@@ -35,6 +46,7 @@ For the time being, ***the only way to stop the program is to CTRL-ALT-DELETE***
 ## TODO
 * Keep perfecting the dictionary
 * Freeze the tensorflow models for faster loading
+* Create custom python C++ wrapper for tensorflow-lite to avoid loading in massive tensorflow development dll
 
 ## Old demonstration video
 [![Demonstration](http://img.youtube.com/vi/SgWCdYiSb5Q/0.jpg)](http://www.youtube.com/watch?v=SgWCdYiSb5Q "Old Demonstration")
