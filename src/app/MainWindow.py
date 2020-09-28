@@ -21,9 +21,11 @@ class MainWindow(QtWidgets.QMainWindow):
         trace_list_widget = TraceListWidget(None, self.app.tracer)
         extractor_widget = ExtractorWidget(None, self.app.extractor)
 
-        main_tab = QtWidgets.QSplitter()
-        main_tab.addWidget(left_panel)
-        main_tab.addWidget(preview_widget)
+        main_tab = QtWidgets.QWidget()
+        layout = QtWidgets.QHBoxLayout()
+        layout.addWidget(left_panel)
+        layout.addWidget(preview_widget)
+        main_tab.setLayout(layout)
 
         tabs = QtWidgets.QTabWidget()
         tabs.addTab(main_tab, "Primary")
@@ -36,6 +38,7 @@ class MainWindow(QtWidgets.QMainWindow):
         app.tracer.progress_changed.connect(update_progress_tab)
 
         self.setCentralWidget(tabs)
+        self.adjustSize()
 
     def create_left_panel(self):
         group = QtWidgets.QWidget()

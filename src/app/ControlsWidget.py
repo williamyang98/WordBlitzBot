@@ -13,14 +13,17 @@ class ControlsWidget(QtWidgets.QWidget):
 
         read_button = QtWidgets.QPushButton()
         read_button.setText("Read")
+        read_button.setToolTip("Read characters, bonuses, values from screen")
         read_button.clicked.connect(self.analyser.read_matrix)
 
         calculate_button = QtWidgets.QPushButton()
         calculate_button.setText("Calculate")
+        calculate_button.setToolTip("Determine best list of words from read")
         calculate_button.clicked.connect(self.tracer.calculate_traces)
 
         start_button = QtWidgets.QPushButton()
         start_button.setText("Start")
+        start_button.setToolTip("Start executing the list of words")
         start_button.clicked.connect(self.start_threaded_trace)
 
         delay_slider = QtWidgets.QSpinBox()
