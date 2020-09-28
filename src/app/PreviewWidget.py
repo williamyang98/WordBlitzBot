@@ -5,7 +5,7 @@ import time
 from src.models import LambdaRunner
 
 class PreviewWidget(QtWidgets.QLabel):
-    def __init__(self, parent, preview, thread_pool):
+    def __init__(self, parent, preview, thread_pool, app):
         super().__init__(parent=parent)
         self.preview = preview
         self.thread_pool = thread_pool
@@ -21,7 +21,7 @@ class PreviewWidget(QtWidgets.QLabel):
 
         @LambdaRunner
         def start_runner():
-            while True:
+            while app.is_running:
                 self.update()
                 time.sleep(25 / 1000)
 
