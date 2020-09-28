@@ -5,6 +5,7 @@ cachetools==4.0.0
 certifi==2019.11.28
 chardet==3.0.4
 contextlib2==0.5.5
+cssselect==1.1.0
 future==0.18.2
 gast==0.2.2
 google-auth==1.10.0
