@@ -9,4 +9,4 @@ class LambdaRunner(QtCore.QRunnable):
         self.runner()
 
     def autoDelete(self):
-        return True
+        return False
