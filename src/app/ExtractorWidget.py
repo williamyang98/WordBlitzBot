@@ -1,7 +1,7 @@
 from PySide2 import QtGui, QtCore, QtWidgets
 from PySide2.QtCore import Slot, Signal
 
-class HTMLDictionaryExtractorWidget(QtWidgets.QWidget):
+class ExtractorWidget(QtWidgets.QWidget):
     def __init__(self, parent, extractor):
         super().__init__(parent=parent)
         self.extractor = extractor
@@ -38,18 +38,22 @@ class HTMLDictionaryExtractorWidget(QtWidgets.QWidget):
 
         save_button = QtWidgets.QPushButton()
         save_button.setText("Save")
+        save_button.setToolTip("Save changes to dictionary file")
         save_button.clicked.connect(self.extractor.save_dictionary)
 
         load_button = QtWidgets.QPushButton()
         load_button.setText("Load")
+        load_button.setToolTip("Load dictionary from file")
         load_button.clicked.connect(self.extractor.load_dictionary)
 
         extract_button = QtWidgets.QPushButton()
         extract_button.setText("Extract")
+        extract_button.setToolTip("Extract the words to remove/add from html")
         extract_button.clicked.connect(self.extractor.get_dictionary_diff)
 
         apply_button = QtWidgets.QPushButton()
         apply_button.setText("Apply")
+        apply_button.setToolTip("Apply changes to dictionary in memory (Use save to update dictionary on disk)")
         apply_button.clicked.connect(self.extractor.apply_dictionary_diff)
 
         layout.addWidget(save_button)

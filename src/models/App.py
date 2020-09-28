@@ -2,7 +2,10 @@ from PySide2 import QtCore
 
 from .Preview import Preview
 from .Analyser import Analyser
-from .HTMLDictionaryExtractor import HTMLDictionaryExtractor
+
+# update for latest version of wordblitz
+# 28/09/2020
+from .extractor import Extractor, extract_words_v2
 
 from .exporter import Exporter
 from .solver import Solver
@@ -17,6 +20,7 @@ from src.util import load_bounding_boxes
 class App(QtCore.QObject):
     def __init__(self, config):
         super().__init__()
+        self.is_running = True
         self.config = config
         
         self.matrix = Matrix()
@@ -32,7 +36,9 @@ class App(QtCore.QObject):
         self.analyser = Analyser(self.preview, self.matrix, self.config)
 
         self.tracer = Tracer(self.solver, self.preview, self.matrix)
-        self.extractor = HTMLDictionaryExtractor(self.tracer, self.dictionary, self.config)
+
+        # update to v2 extractor
+        self.extractor = Extractor(self.tracer, self.dictionary, self.config, extract_words_v2)
 
         self.exporter = Exporter(self.tracer, self.preview, self.matrix, self.extractor, self.config)
 

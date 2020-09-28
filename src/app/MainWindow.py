@@ -8,23 +8,34 @@ from .ControlsWidget import ControlsWidget
 from .PreviewAdjusterWidget import PreviewAdjusterWidget
 
 from .TraceListWidget import TraceListWidget
-from .HTMLDictionaryExtractorWidget import HTMLDictionaryExtractorWidget
+from .ExtractorWidget import ExtractorWidget
 
-class MainWindow(QtWidgets.QSplitter):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, app):
         super().__init__()
         self.app = app
         self.setWindowTitle("Word Blitz Bot")
 
         left_panel = self.create_left_panel()
-        preview_widget = PreviewWidget(None, self.app.preview, self.app.thread_pool)
+        preview_widget = PreviewWidget(None, self.app.preview, self.app.thread_pool, app)
         trace_list_widget = TraceListWidget(None, self.app.tracer)
-        extractor_widget = HTMLDictionaryExtractorWidget(None, self.app.extractor)
+        extractor_widget = ExtractorWidget(None, self.app.extractor)
 
-        self.addWidget(left_panel)
-        self.addWidget(preview_widget)
-        self.addWidget(trace_list_widget)
-        self.addWidget(extractor_widget)
+        main_tab = QtWidgets.QSplitter()
+        main_tab.addWidget(left_panel)
+        main_tab.addWidget(preview_widget)
+
+        tabs = QtWidgets.QTabWidget()
+        tabs.addTab(main_tab, "Primary")
+        tabs.addTab(trace_list_widget, "Progress")
+        tabs.addTab(extractor_widget, "Dictionary Editor")
+
+        def update_progress_tab(prog):
+            tabs.setTabText(1, f"Progress ({prog*100:.0f}%)")
+        
+        app.tracer.progress_changed.connect(update_progress_tab)
+
+        self.setCentralWidget(tabs)
 
     def create_left_panel(self):
         group = QtWidgets.QWidget()
@@ -43,3 +54,9 @@ class MainWindow(QtWidgets.QSplitter):
         group.setLayout(layout)
 
         return group
+
+    # active threads use app.is_running 
+    # use this to stop all threads so app closes properly 
+    def closeEvent(self, event):
+        self.app.is_running = False
+        return super().closeEvent(event)
