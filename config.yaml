@@ -24,9 +24,9 @@ exporter:
       traces: traces.csv
     output_dir: assets\data\traces\{i}
 models:
-  bonuses: assets\models\bonuses.h5
-  characters: assets\models\characters.h5
-  values: assets\models\two_digit_classifier.h5
+  bonuses: assets\models\bonuses.tflite
+  characters: assets\models\characters.tflite
+  values: assets\models\two_digit_classifier.tflite
 screen_rect:
   height: 404
   left: 752

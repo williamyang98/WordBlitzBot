@@ -42,11 +42,10 @@ You can edit this for your own language in (src/models/dictionary/Dictionary.py)
 * Fast loading time for the dictionary
 * Fast character/digit recognition using machine learning
 * HTML parser to extract missed words and invalid words
+* Freeze the tensorflow models for faster loading
 
 ## TODO
 * Keep perfecting the dictionary
-* Freeze the tensorflow models for faster loading
-* Create custom python C++ wrapper for tensorflow-lite to avoid loading in massive tensorflow development dll
 
 ## Old demonstration video
 [![Demonstration](http://img.youtube.com/vi/SgWCdYiSb5Q/0.jpg)](http://www.youtube.com/watch?v=SgWCdYiSb5Q "Old Demonstration")

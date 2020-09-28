@@ -1,4 +1,3 @@
-import keras
 import numpy as np
 import cv2
 
@@ -29,7 +28,7 @@ class Analyser:
 
     def read_characters(self):
         images = self.preview.get_characters()
-        images = self.resize_images(images, (36, 36))
+        images = self.resize_images(images, self.characters_model.input_shape[1:3])
         predictions = self.characters_model.predict(images/255.0)
 
         def convert_prediction(prediction):
@@ -44,7 +43,7 @@ class Analyser:
 
     def read_values(self):
         images = self.preview.get_values()
-        images = self.resize_images(images, (17, 22))
+        images = self.resize_images(images, self.values_model.input_shape[1:3])
         predictions = self.values_model.predict(images/255.0)
 
         def convert_prediction(prediction):
@@ -64,7 +63,7 @@ class Analyser:
     
     def read_bonuses(self):
         images = self.preview.get_bonuses()
-        images = self.resize_images(images, (15, 22))
+        images = self.resize_images(images, self.bonuses_model.input_shape[1:3])
         predictions = self.bonuses_model.predict(images/255.0)
 
         mapping = [" ", "2L", "2W", "3L", "3W"]
