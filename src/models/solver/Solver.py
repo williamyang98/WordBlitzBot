@@ -43,7 +43,13 @@ class Solver:
 
         for position in path:
             cell = matrix.get_cell(position)
-            product_sum += cell.value
+            if cell.bonus == '2L':
+                product_sum += 2*cell.value
+            elif cell.bonus == '3L':
+                product_sum += 3*cell.value
+            else:
+                product_sum += cell.value
+
             if cell.bonus == '3W':
                 multiplier *= 3
             elif cell.bonus == '2W':
