@@ -32,7 +32,7 @@ See (https://github.com/dwyl/english-words) as an example.
 
 ***NOTE:*** 
 With the current way dictionaries are stored, only English words can be removed. 
-You can edit this for your own language in src/models/Dictionary.py on line 35.
+You can edit this for your own language in (src/models/dictionary/Dictionary.py) on line 35.
 
 ## Completed
 * Autoclicking and dragging
