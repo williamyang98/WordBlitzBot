@@ -24,6 +24,7 @@ Press the following buttons:
 For the time being, ***the only way to stop the program is to CTRL-ALT-DELETE***.
 
 ## Other languages support
+Use the master branch if you are planning on developing your own dictionary.
 Right now there is only an English dictionary. To add your own dictionary, you can use
 ```python3 util/build_dictionary.py <your file>```
 
