@@ -3,7 +3,8 @@ Can automatically solve a word blitz game. To run the program execute the follow
 
 ## Installation
 1. You will need a install of python3 or above. [Download](https://www.python.org/downloads/).
-2. Install all the python dependencies by running ```pip install -r requirements.txt``` or ```pip3 install -r requirements.txt```.
+2. Download source code by cloning r1.0 branch, or downloading from releases.
+3. Install all the python dependencies by running ```pip install -r requirements.txt``` or ```pip3 install -r requirements.txt```.
 
 ### Optional Installation Instructions
 If you want to keep your python install independent of any dependencies in this project, you can install a virtual environment.
