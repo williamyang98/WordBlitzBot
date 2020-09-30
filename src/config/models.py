@@ -21,7 +21,7 @@ models_schema = Schema({
 })
 
 models_yaml = {
-    "characters": os.path.join(default_dir, "models", "characters.h5"),
-    "values": os.path.join(default_dir, "models", "two_digit_classifier.h5"),
-    "bonuses": os.path.join(default_dir, "models", "bonuses.h5"),
+    "characters": os.path.join(default_dir, "quantized_models", "characters.tflite"),
+    "values": os.path.join(default_dir, "quantized_models", "two_digit_classifier.tflite"),
+    "bonuses": os.path.join(default_dir, "quantized_models", "bonuses.tflite"),
 }
