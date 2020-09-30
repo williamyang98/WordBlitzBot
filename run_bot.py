@@ -23,7 +23,7 @@ def main():
     except FileNotFoundError:
         with open(args.config, "w") as fp:
             yaml.dump(default_yaml, fp)
-            config = default_yaml
+            config = app_schema.validate(default_yaml)
 
     app = App(config)
 
