@@ -2,7 +2,7 @@
 Can automatically solve a word blitz game. To run the program execute the following command.
 
 ## Installation
-1. You will need a install of python3 or above. [Download](https://www.python.org/downloads/).
+1. You will need a install of python3.7.9. [Download](https://www.python.org/downloads/release/python-379/).
 2. Download source code by cloning r1.0 branch, or downloading from releases.
 3. Install all the python dependencies by running ```pip install -r requirements.txt``` or ```pip3 install -r requirements.txt```.
 
