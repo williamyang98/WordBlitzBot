@@ -53,6 +53,6 @@ You can edit this for your own language in (src/models/dictionary/Dictionary.py)
 [![Demonstration](http://img.youtube.com/vi/SgWCdYiSb5Q/0.jpg)](http://www.youtube.com/watch?v=SgWCdYiSb5Q "Old Demonstration")
 
 ## Gallery
-![alt text](docs/window_v2.png "Main window")
+![alt text](https://github.com/FiendChain/WordBlitzBot/blob/master/docs/window_v2.png "Main window")
 
 
