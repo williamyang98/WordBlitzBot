@@ -14,7 +14,7 @@ PyRect==0.1.4
 PyScreeze==0.1.26
 PySide2==5.15.1
 PyTweening==1.0.3
-PyYAML==5.3.1
+PyYAML==5.4
 schema==0.7.2
 shiboken2==5.15.1
 tflite_runtime-2.5.0.post1-cp39-cp39-win_amd64.whl
